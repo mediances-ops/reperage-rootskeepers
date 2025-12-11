@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Correspondants locaux - RootsKeepers</title>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+            padding: 20px;
+            color: #2d3748;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .header h1 {
+            color: #1a202c;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            letter-spacing: -0.5px;
+        }
+
+        .header .subtitle {
+            color: #4a5568;
+            font-size: 1.5rem;
+            font-weight: 500;
+        }
+
+        .nav {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            background: white;
+            color: #3b82f6;
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .nav-link:hover {
+            background: #3b82f6;
+            color: white;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        .nav-link.active {
+            background: #667eea;
+            color: white;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2563eb;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .card h3 {
+            color: #1a202c;
+            margin-bottom: 20px;
+            font-weight: 700;
+            font-size: 1.3rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            padding: 15px;
+            text-align: left;
+            color: #1a202c;
+            font-weight: 700;
+            border-bottom: 2px solid #e2e8f0;
+            background: #f8f9fc;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #f1f5f9;
+            color: #2d3748;
+        }
+
+        tr:hover {
+            background: #f8fafc;
+        }
+
+        .badge {
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: inline-block;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-actif {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge-inactif {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .lien-fixer {
+            background: #f8f9fc;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border: 2px solid #e2e8f0;
+        }
+
+        .lien-fixer input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            font-family: monospace;
+            color: #2d3748;
+        }
+
+        .copy-btn {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 6px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .copy-btn:hover {
+            background: #2563eb;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #1a202c;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            background: white;
+            color: #2d3748;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 {
+            color: #FF6B35;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 2rem;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .close-btn:hover {
+            color: #333;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 0.9rem;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1><i data-lucide="users"></i> Correspondants locaux</h1>
+            <p class="subtitle">Créez et gérez les correspondants avec leurs liens personnalisés</p>
+        </div>
+
+        <!-- Navigation -->
+        <div class="nav">
+            <a href="/admin" class="nav-link"><i data-lucide="layout-dashboard"></i> Tableau de bord</a>
+            <a href="/admin/fixers" class="nav-link active"><i data-lucide="users"></i> Correspondants locaux</a>
+            <a href="/" class="nav-link"><i data-lucide="file-plus"></i> Nouveau Repérage</a>
+            <a href="/admin/logout" class="nav-link"><i data-lucide="log-out"></i> Déconnexion</a>
+        </div>
+
+        <!-- Action Button -->
+        <div style="margin-bottom: 20px;">
+            <button onclick="openModal()" class="btn btn-primary"><i data-lucide="plus"></i> Nouveau Correspondant</button>
+        </div>
+
+        <!-- Fixers List -->
+        <div class="card">
+            {% if fixers %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nom</th>
+                        <th>Pays / Région</th>
+                        <th>Contact</th>
+                        <th>Langue</th>
+                        <th>Lien Personnel</th>
+                        <th>Statut</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for fixer in fixers %}
+                    <tr>
+                        <td><strong>{{ fixer.prenom }} {{ fixer.nom }}</strong></td>
+                        <td>
+                            {{ fixer.pays or '-' }}<br>
+                            <small style="color: #666;">{{ fixer.region or '-' }}</small>
+                        </td>
+                        <td>
+                            {{ fixer.email }}<br>
+                            <small style="color: #666;">{{ fixer.telephone or '-' }}</small>
+                        </td>
+                        <td>{{ fixer.langue_preferee }}</td>
+                        <td>
+                            <div class="lien-fixer">
+                                <input type="text" value="{{ fixer.lien_personnel }}" readonly id="lien-{{ fixer.id }}">
+                                <button class="copy-btn" onclick="copyLink('lien-{{ fixer.id }}')">📋 Copier</button>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="badge badge-{{ 'actif' if fixer.actif else 'inactif' }}">
+                                {{ 'Actif' if fixer.actif else 'Inactif' }}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="actions">
+                                <a href="/admin/fixer/{{ fixer.id }}/edit" class="btn btn-primary btn-small">Modifier</a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty-state">
+                <h3>Aucun correspondant</h3>
+                <p>Créez votre premier correspondant local pour commencer.</p>
+                <br>
+                <button onclick="openModal()" class="btn btn-primary">Créer un correspondant</button>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Modal Nouveau Correspondant -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>➕ Nouveau Correspondant</h2>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <form method="POST" action="/admin/fixer/new">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="prenom">Prénom *</label>
+                        <input type="text" name="prenom" id="prenom" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="nom">Nom *</label>
+                        <input type="text" name="nom" id="nom" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email *</label>
+                    <input type="email" name="email" id="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="telephone">Téléphone</label>
+                    <input type="tel" name="telephone" id="telephone">
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="pays">Pays *</label>
+                        <input type="text" name="pays" id="pays" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="region">Région</label>
+                        <input type="text" name="region" id="region">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="langue_preferee">Langue préférée *</label>
+                    <select name="langue_preferee" id="langue_preferee" required>
+                        <option value="FR">🇫🇷 Français</option>
+                        <option value="GB">🇬🇧 English</option>
+                        <option value="ITAL">🇮🇹 Italiano</option>
+                        <option value="ESP">🇪🇸 Español</option>
+                    </select>
+                </div>
+                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                    <button type="submit" class="btn btn-primary">Créer le fixer</button>
+                    <button type="button" onclick="closeModal()" class="btn" style="background: #e0e0e0;">Annuler</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function openModal() {
+            document.getElementById('modal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.remove('active');
+        }
+
+        function copyLink(inputId) {
+            const input = document.getElementById(inputId);
+            input.select();
+            document.execCommand('copy');
+            alert('Lien copié dans le presse-papier !');
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('modal').addEventListener('click', (e) => {
+            if (e.target.id === 'modal') {
+                closeModal();
+            }
+        });
+        
+        // Initialize Lucide Icons
+        lucide.createIcons();
+    </script>
+</body>
+</html>
