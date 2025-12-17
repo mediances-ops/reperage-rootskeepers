@@ -995,75 +995,10 @@
         }
     </script>
 
-<!-- PANNEAU IA LATÉRAL GAUCHE -->
-<button class="ai-floating-btn" onclick="toggleAIPanel()" title="Assistant IA RootsKeepers">
-    <i data-lucide="brain-circuit" style="width: 28px; height: 28px;"></i>
-</button>
 
-<div class="ai-panel-overlay" id="aiPanelOverlay" onclick="closeAIPanel()"></div>
 
-<div class="ai-panel" id="aiPanel">
-    <div class="ai-panel-header">
-        <div style="display: flex; align-items: center; gap: 12px;">
-            <i data-lucide="brain-circuit" style="width: 24px; height: 24px; color: white;"></i>
-            <h3 style="margin: 0; color: white; font-size: 1.1rem;">Assistant IA RootsKeepers</h3>
-        </div>
-        <button class="ai-panel-close" onclick="closeAIPanel()">
-            <i data-lucide="x" style="width: 20px; height: 20px;"></i>
-        </button>
-    </div>
-    
-    <div class="ai-panel-body">
-        <iframe 
-            src="https://destinationsetcuisines.com/site" 
-            frameborder="0"
-            style="width: 100%; height: 100%; border: none;"
-            title="Assistant IA RootsKeepers"
-        ></iframe>
-    </div>
-</div>
 
-<script>
-// PANNEAU IA - JAVASCRIPT
-function toggleAIPanel() {
-    const panel = document.getElementById('aiPanel');
-    const overlay = document.getElementById('aiPanelOverlay');
-    
-    if (panel.classList.contains('active')) {
-        closeAIPanel();
-    } else {
-        openAIPanel();
-    }
-}
-
-function openAIPanel() {
-    const panel = document.getElementById('aiPanel');
-    const overlay = document.getElementById('aiPanelOverlay');
-    
-    panel.classList.add('active');
-    overlay.classList.add('active');
-    document.body.style.overflow = 'hidden';
-    
-    if (typeof lucide !== 'undefined') {
-        lucide.createIcons();
-    }
-}
-
-function closeAIPanel() {
-    const panel = document.getElementById('aiPanel');
-    const overlay = document.getElementById('aiPanelOverlay');
-    
-    panel.classList.remove('active');
-    overlay.classList.remove('active');
-    document.body.style.overflow = '';
-}
-
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') {
-        closeAIPanel();
-    }
-});
-</script>
 
 </body>
 </html>
+
