@@ -15,10 +15,10 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f5f7fa;
+            background: #f3f4f6;
             min-height: 100vh;
             padding: 20px;
-            color: #2d3748;
+            color: #2C3E50;
         }
 
         .container {
@@ -27,15 +27,15 @@
         }
 
         .header {
-            background: white;
-            border-radius: 12px;
+            background: linear-gradient(135deg, #2C3E50 0%, #34495e 100%);
+            border-radius: 16px;
             padding: 40px;
             margin-bottom: 30px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            box-shadow: 0 8px 16px rgba(44, 62, 80, 0.2);
         }
 
         .header h1 {
-            color: #1a202c;
+            color: white;
             font-size: 2.5rem;
             font-weight: 700;
             margin-bottom: 10px;
@@ -43,7 +43,7 @@
         }
 
         .header .subtitle {
-            color: #4a5568;
+            color: #E67E22;
             font-size: 1.5rem;
             font-weight: 500;
         }
@@ -57,26 +57,26 @@
 
         .nav-link {
             background: white;
-            color: #3b82f6;
-            padding: 12px 24px;
-            border-radius: 8px;
+            color: #E67E22;
+            padding: 14px 28px;
+            border-radius: 12px;
             text-decoration: none;
             font-weight: 600;
-            transition: all 0.2s ease;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
         }
 
         .nav-link:hover {
-            background: #3b82f6;
+            background: linear-gradient(135deg, #E67E22 0%, #D35400 100%);
             color: white;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(230, 126, 34, 0.3);
         }
 
         .nav-link.active {
-            background: #667eea;
+            background: linear-gradient(135deg, #E67E22 0%, #D35400 100%);
             color: white;
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+            box-shadow: 0 6px 16px rgba(230, 126, 34, 0.4);
         }
 
         .btn {
@@ -311,20 +311,84 @@
         <!-- Header -->
         <div class="header">
             <h1><i data-lucide="users"></i> Correspondants locaux</h1>
-            <p class="subtitle">Créez et gérez les correspondants avec leurs liens personnalisés</p>
+            <p class="subtitle">Gestion du Réseau international</p>
         </div>
 
         <!-- Navigation -->
         <div class="nav">
             <a href="/admin" class="nav-link"><i data-lucide="layout-dashboard"></i> Tableau de bord</a>
             <a href="/admin/fixers" class="nav-link active"><i data-lucide="users"></i> Correspondants locaux</a>
-            <a href="/" class="nav-link"><i data-lucide="file-plus"></i> Nouveau Repérage</a>
             <a href="/admin/logout" class="nav-link"><i data-lucide="log-out"></i> Déconnexion</a>
         </div>
 
         <!-- Action Button -->
         <div style="margin-bottom: 20px;">
-            <button onclick="openModal()" class="btn btn-primary"><i data-lucide="plus"></i> Nouveau Correspondant</button>
+            <a href="/admin/fixer/new" class="btn btn-primary"><i data-lucide="plus"></i> Nouveau Correspondant</a>
+        </div>
+
+        <!-- FILTRES ENRICHIS -->
+        <div class="card" style="margin-bottom: 20px;">
+            <form method="GET" action="/admin/fixers" style="display: flex; gap: 15px; flex-wrap: wrap; align-items: end;">
+                
+                <!-- Recherche -->
+                <div style="flex: 1; min-width: 200px;">
+                    <label style="display: block; font-weight: 600; margin-bottom: 8px; color: #2C3E50;">
+                        <i data-lucide="search" style="width: 16px; height: 16px;"></i> Recherche
+                    </label>
+                    <input type="text" name="search" value="{{ request.args.get('search', '') }}" placeholder="Nom, société..." style="width: 100%; padding: 10px 15px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 0.95rem;">
+                </div>
+
+                <!-- Filtre Pays -->
+                <div style="min-width: 150px;">
+                    <label style="display: block; font-weight: 600; margin-bottom: 8px; color: #2C3E50;">
+                        <i data-lucide="map" style="width: 16px; height: 16px;"></i> Pays
+                    </label>
+                    <select name="pays" style="width: 100%; padding: 10px 15px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 0.95rem;">
+                        <option value="">Tous les pays</option>
+                        {% for pays in pays_list %}
+                        <option value="{{ pays }}" {% if request.args.get('pays') == pays %}selected{% endif %}>{{ pays }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Filtre Langue -->
+                <div style="min-width: 150px;">
+                    <label style="display: block; font-weight: 600; margin-bottom: 8px; color: #2C3E50;">
+                        <i data-lucide="languages" style="width: 16px; height: 16px;"></i> Langue
+                    </label>
+                    <select name="langue" style="width: 100%; padding: 10px 15px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 0.95rem;">
+                        <option value="">Toutes langues</option>
+                        <option value="Français" {% if request.args.get('langue') == 'Français' %}selected{% endif %}>🇫🇷 Français</option>
+                        <option value="Anglais" {% if request.args.get('langue') == 'Anglais' %}selected{% endif %}>🇬🇧 Anglais</option>
+                        <option value="Italien" {% if request.args.get('langue') == 'Italien' %}selected{% endif %}>🇮🇹 Italien</option>
+                        <option value="Espagnol" {% if request.args.get('langue') == 'Espagnol' %}selected{% endif %}>🇪🇸 Espagnol</option>
+                        <option value="Allemand" {% if request.args.get('langue') == 'Allemand' %}selected{% endif %}>🇩🇪 Allemand</option>
+                        <option value="Portugais" {% if request.args.get('langue') == 'Portugais' %}selected{% endif %}>🇵🇹 Portugais</option>
+                    </select>
+                </div>
+
+                <!-- Filtre Statut -->
+                <div style="min-width: 130px;">
+                    <label style="display: block; font-weight: 600; margin-bottom: 8px; color: #2C3E50;">
+                        <i data-lucide="toggle-left" style="width: 16px; height: 16px;"></i> Statut
+                    </label>
+                    <select name="statut" style="width: 100%; padding: 10px 15px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 0.95rem;">
+                        <option value="">Tous</option>
+                        <option value="actif" {% if request.args.get('statut') == 'actif' %}selected{% endif %}>Actif</option>
+                        <option value="inactif" {% if request.args.get('statut') == 'inactif' %}selected{% endif %}>Inactif</option>
+                    </select>
+                </div>
+
+                <!-- Boutons -->
+                <div style="display: flex; gap: 10px;">
+                    <button type="submit" class="btn btn-primary" style="padding: 10px 20px;">
+                        <i data-lucide="filter" style="width: 16px; height: 16px;"></i> Filtrer
+                    </button>
+                    <a href="/admin/fixers" class="btn btn-secondary" style="padding: 10px 20px; display: inline-flex; align-items: center; gap: 8px;">
+                        <i data-lucide="x" style="width: 16px; height: 16px;"></i> Réinitialiser
+                    </a>
+                </div>
+            </form>
         </div>
 
         <!-- Fixers List -->
@@ -333,11 +397,12 @@
             <table>
                 <thead>
                     <tr>
+                        <th style="width: 50px;"></th>
                         <th>Nom</th>
-                        <th>Pays / Région</th>
+                        <th>Société / Fonction</th>
+                        <th>Pays / Ville</th>
                         <th>Contact</th>
-                        <th>Langue</th>
-                        <th>Lien Personnel</th>
+                        <th>Langues</th>
                         <th>Statut</th>
                         <th>Actions</th>
                     </tr>
@@ -345,21 +410,56 @@
                 <tbody>
                     {% for fixer in fixers %}
                     <tr>
-                        <td><strong>{{ fixer.prenom }} {{ fixer.nom }}</strong></td>
-                        <td>
-                            {{ fixer.pays or '-' }}<br>
-                            <small style="color: #666;">{{ fixer.region or '-' }}</small>
+                        <td style="text-align: center;">
+                            {% if fixer.photo_profil_url %}
+                            <img src="{{ fixer.photo_profil_url }}" alt="{{ fixer.prenom }}" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid #e2e8f0;">
+                            {% else %}
+                            <div style="width: 40px; height: 40px; border-radius: 50%; background: #e2e8f0; display: flex; align-items: center; justify-content: center; color: #a0aec0; font-weight: 600;">
+                                {{ fixer.prenom[0] if fixer.prenom else '?' }}{{ fixer.nom[0] if fixer.nom else '' }}
+                            </div>
+                            {% endif %}
                         </td>
                         <td>
-                            {{ fixer.email }}<br>
+                            <strong style="font-size: 1rem;">{{ fixer.prenom }} {{ fixer.nom }}</strong>
+                        </td>
+                        <td>
+                            {% if fixer.societe %}<strong>{{ fixer.societe }}</strong><br>{% endif %}
+                            <small style="color: #666;">{{ fixer.fonction or '-' }}</small>
+                        </td>
+                        <td>
+                            <strong>{{ fixer.pays or '-' }}</strong><br>
+                            <small style="color: #666;">{{ fixer.ville or fixer.region or '-' }}</small>
+                        </td>
+                        <td>
+                            <a href="mailto:{{ fixer.email }}" style="color: #3b82f6; text-decoration: none;">{{ fixer.email }}</a><br>
                             <small style="color: #666;">{{ fixer.telephone or '-' }}</small>
                         </td>
-                        <td>{{ fixer.langue_preferee }}</td>
                         <td>
-                            <div class="lien-fixer">
-                                <input type="text" value="{{ fixer.lien_personnel }}" readonly id="lien-{{ fixer.id }}">
-                                <button class="copy-btn" onclick="copyLink('lien-{{ fixer.id }}')">📋 Copier</button>
-                            </div>
+                            {% if fixer.langues_parlees %}
+                                {% set langues = fixer.langues_parlees.split(',') %}
+                                <div style="display: flex; gap: 4px; flex-wrap: wrap;">
+                                    {% for langue in langues %}
+                                    <span style="display: inline-block; padding: 3px 8px; background: #f0f9ff; color: #0369a1; border-radius: 12px; font-size: 0.75rem; font-weight: 500;">
+                                        {% if 'Français' in langue %}🇫🇷{% endif %}
+                                        {% if 'Anglais' in langue %}🇬🇧{% endif %}
+                                        {% if 'Italien' in langue %}🇮🇹{% endif %}
+                                        {% if 'Espagnol' in langue %}🇪🇸{% endif %}
+                                        {% if 'Allemand' in langue %}🇩🇪{% endif %}
+                                        {% if 'Portugais' in langue %}🇵🇹{% endif %}
+                                        {% if 'Chinois' in langue %}🇨🇳{% endif %}
+                                        {% if 'Japonais' in langue %}🇯🇵{% endif %}
+                                        {{ langue.strip() }}
+                                    </span>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                            <span style="display: inline-block; padding: 3px 8px; background: #f0f9ff; color: #0369a1; border-radius: 12px; font-size: 0.75rem; font-weight: 500;">
+                                {% if fixer.langue_preferee == 'FR' %}🇫🇷 Français{% endif %}
+                                {% if fixer.langue_preferee == 'GB' %}🇬🇧 Anglais{% endif %}
+                                {% if fixer.langue_preferee == 'ITAL' %}🇮🇹 Italien{% endif %}
+                                {% if fixer.langue_preferee == 'ESP' %}🇪🇸 Espagnol{% endif %}
+                            </span>
+                            {% endif %}
                         </td>
                         <td>
                             <span class="badge badge-{{ 'actif' if fixer.actif else 'inactif' }}">
@@ -368,7 +468,12 @@
                         </td>
                         <td>
                             <div class="actions">
-                                <a href="/admin/fixer/{{ fixer.id }}/edit" class="btn btn-primary btn-small">Modifier</a>
+                                <a href="/admin/fixer/{{ fixer.id }}" class="btn btn-secondary btn-small" style="margin-right: 8px;">
+                                    <i data-lucide="eye" style="width: 16px; height: 16px;"></i> Voir
+                                </a>
+                                <a href="/admin/fixer/{{ fixer.id }}/edit" class="btn btn-primary btn-small">
+                                    <i data-lucide="edit" style="width: 16px; height: 16px;"></i> Modifier
+                                </a>
                             </div>
                         </td>
                     </tr>

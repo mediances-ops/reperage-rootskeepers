@@ -141,6 +141,18 @@
         "contexte": "Photos du contexte",
         "documents": "Documents administratifs"
       }
+    },
+    "fixer": {
+      "title": "INFORMATIONS SUR LE CORRESPONDANT LOCAL",
+      "nom": "Nom",
+      "nom_placeholder": "Nom complet",
+      "email": "Email",
+      "email_placeholder": "email@example.com",
+      "telephone": "Téléphone",
+      "telephone_placeholder": "+33 6 12 34 56 78"
+    },
+    "grille": {
+      "title": "GRILLE DE REPÉRAGE"
     }
   },
   "GB": {
@@ -285,6 +297,18 @@
         "contexte": "Context photos",
         "documents": "Administrative documents"
       }
+    },
+    "fixer": {
+      "title": "LOCAL CORRESPONDENT INFORMATION",
+      "nom": "Name",
+      "nom_placeholder": "Full name",
+      "email": "Email",
+      "email_placeholder": "email@example.com",
+      "telephone": "Phone",
+      "telephone_placeholder": "+33 6 12 34 56 78"
+    },
+    "grille": {
+      "title": "SCOUTING GRID"
     }
   },
   "ITAL": {
@@ -428,6 +452,18 @@
         "contexte": "Foto del contesto",
         "documents": "Documenti amministrativi"
       }
+    },
+    "fixer": {
+      "title": "INFORMAZIONI SUL CORRISPONDENTE LOCALE",
+      "nom": "Nome",
+      "nom_placeholder": "Nome completo",
+      "email": "Email",
+      "email_placeholder": "email@example.com",
+      "telephone": "Telefono",
+      "telephone_placeholder": "+39 123 456 7890"
+    },
+    "grille": {
+      "title": "GRIGLIA DI SOPRALLUOGO"
     }
   },
   "ESP": {
@@ -571,6 +607,18 @@
         "contexte": "Fotos del contexto",
         "documents": "Documentos administrativos"
       }
+    },
+    "fixer": {
+      "title": "INFORMACIÓN DEL CORRESPONSAL LOCAL",
+      "nom": "Nombre",
+      "nom_placeholder": "Nombre completo",
+      "email": "Email",
+      "email_placeholder": "email@example.com",
+      "telephone": "Teléfono",
+      "telephone_placeholder": "+34 123 456 789"
+    },
+    "grille": {
+      "title": "CUADRÍCULA DE RECONOCIMIENTO"
     }
   }
 }

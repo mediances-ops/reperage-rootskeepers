@@ -94,49 +94,83 @@ async function loadTranslations(lang) {
 }
 
 function applyTranslations() {
-    // Header
-    document.querySelector('h1').textContent = translations.header.title;
-    document.querySelector('.subtitle').textContent = translations.header.subtitle;
+    console.log("🌍 Application des traductions...");
     
-    // Intro
-    const introTexts = document.querySelectorAll('.intro-box p');
-    if (introTexts.length >= 3) {
-        introTexts[0].innerHTML = translations.intro.text1;
-        introTexts[1].innerHTML = translations.intro.text2;
-        introTexts[2].innerHTML = translations.intro.text3;
+    try {
+        // 1. Traduire les éléments avec data-i18n (LABELS, TITRES)
+        document.querySelectorAll('[data-i18n]').forEach(element => {
+            const key = element.getAttribute('data-i18n');
+            const translation = getNestedTranslation(translations, key);
+            
+            if (translation) {
+                element.textContent = translation;
+            }
+        });
+        
+        // 2. Traduire les placeholders avec data-i18n-placeholder
+        document.querySelectorAll('[data-i18n-placeholder]').forEach(element => {
+            const key = element.getAttribute('data-i18n-placeholder');
+            const translation = getNestedTranslation(translations, key);
+            
+            if (translation) {
+                element.placeholder = translation;
+            }
+        });
+        
+        console.log("✅ Traductions appliquées avec succès!");
+        
+    } catch (error) {
+        console.error("❌ Erreur application traductions:", error);
+    }
+}
+
+// Fonction helper pour naviguer dans l'objet JSON
+function getNestedTranslation(obj, path) {
+    const keys = path.split('.');
+    let result = obj;
+    
+    for (const key of keys) {
+        if (result && result[key] !== undefined) {
+            result = result[key];
+        } else {
+            return null;
+        }
     }
     
-    // Onglets
-    document.querySelectorAll('.tab-btn').forEach((btn, index) => {
-        const tabNames = ['territoire', 'episode', 'gardiens', 'gardiens_details', 'lieux'];
-        if (tabNames[index]) {
-            btn.textContent = translations.tabs[tabNames[index]];
-        }
-    });
+    return result;
+}
+
+// Fonction helper pour naviguer dans l'objet JSON
+function getNestedTranslation(obj, path) {
+    const keys = path.split('.');
+    let result = obj;
     
-    // Labels de champs (data-i18n)
-    document.querySelectorAll('[data-i18n]').forEach(element => {
-        const keys = element.getAttribute('data-i18n').split('.');
-        let value = translations;
-        for (let key of keys) {
-            value = value[key];
+    for (const key of keys) {
+        if (result && result[key] !== undefined) {
+            result = result[key];
+        } else {
+            return null;
         }
-        if (value) {
-            element.textContent = value;
-        }
-    });
+    }
     
-    // Placeholders
-    document.querySelectorAll('[data-i18n-placeholder]').forEach(element => {
-        const keys = element.getAttribute('data-i18n-placeholder').split('.');
-        let value = translations;
-        for (let key of keys) {
-            value = value[key];
+    return result;
+}
+
+// Fonction helper pour naviguer dans l'objet JSON
+function getNestedTranslation(obj, path) {
+    const keys = path.split('.');
+    let result = obj;
+    
+    for (const key of keys) {
+        if (result && result[key] !== undefined) {
+            result = result[key];
+        } else {
+            console.warn(`⚠️ Clé introuvable: ${path}`);
+            return null;
         }
-        if (value) {
-            element.placeholder = value;
-        }
-    });
+    }
+    
+    return result;
 }
 
 function initLanguageSelector() {
@@ -200,8 +234,9 @@ async function initReperage() {
         // Charger repérage existant
         await loadReperage(currentReperageId);
     } else {
-        // Créer nouveau repérage
-        await createNewReperage();
+        // NE PLUS créer automatiquement de repérage
+        // Afficher message d'instruction
+        console.log('ℹ️ Aucun repérage actif. Veuillez utiliser le bouton "Nouveau Repérage" depuis le dashboard admin.');
     }
 }
 
@@ -231,6 +266,9 @@ async function createNewReperage() {
 async function loadReperage(id) {
     try {
         const response = await fetch(`${API_URL}/reperages/${id}`);
+        if (!response.ok) {
+            throw new Error(`Repérage ${id} non trouvé`);
+        }
         const reperage = await response.json();
         
         // Remplir les formulaires avec les données
@@ -239,10 +277,11 @@ async function loadReperage(id) {
         console.log('✅ Repérage chargé:', id);
     } catch (error) {
         console.error('Erreur chargement repérage:', error);
-        // Si le repérage n'existe pas, en créer un nouveau
+        // NE PLUS créer automatiquement si le repérage n'existe pas
+        // L'utilisateur doit utiliser le modal "Nouveau Repérage" depuis le dashboard
+        showNotification('Repérage non trouvé', 'error');
         currentReperageId = null;
         localStorage.removeItem('currentReperageId');
-        await createNewReperage();
     }
 }
 
@@ -333,7 +372,9 @@ function collectFormData() {
         pays: getInputValue('pays'),
         region: getInputValue('region'),
         territoire_data: {},
-        episode_data: {}
+        episode_data: {},
+        gardiens: [],  // ✅ NOUVEAU
+        lieux: []      // ✅ NOUVEAU
     };
     
     // Collecter données territoire
@@ -351,6 +392,60 @@ function collectFormData() {
         const value = getInputValue(field);
         if (value) formData.episode_data[field] = value;
     });
+    
+    // ✅ NOUVEAU : Collecter les 3 gardiens
+    for (let i = 1; i <= 3; i++) {
+        const gardienData = {
+            ordre: i,
+            nom: getInputValue(`gardien${i}_nom`),
+            prenom: getInputValue(`gardien${i}_prenom`),
+            age: parseInt(getInputValue(`gardien${i}_age`)) || null,
+            genre: getInputValue(`gardien${i}_genre`),
+            fonction: getInputValue(`gardien${i}_fonction`),
+            savoir_transmis: getInputValue(`gardien${i}_savoir`),
+            adresse: getInputValue(`gardien${i}_adresse`),
+            telephone: getInputValue(`gardien${i}_telephone`),
+            email: getInputValue(`gardien${i}_email`),
+            contact_intermediaire: getInputValue(`gardien${i}_contact`),
+            histoire_personnelle: getInputValue(`gardien${i}_histoire`),
+            evaluation_cinegenie: getInputValue(`gardien${i}_evaluation`),
+            langues_parlees: getInputValue(`gardien${i}_langues`)
+        };
+        
+        // Ajouter seulement si au moins le nom est rempli
+        if (gardienData.nom || gardienData.prenom) {
+            formData.gardiens.push(gardienData);
+        }
+    }
+    
+    // ✅ NOUVEAU : Collecter les 3 lieux
+    for (let i = 1; i <= 3; i++) {
+        const lieuData = {
+            numero_lieu: i,
+            nom: getInputValue(`lieu${i}_nom`),
+            type_environnement: getInputValue(`lieu${i}_type`),
+            description_visuelle: getInputValue(`lieu${i}_description`),
+            elements_symboliques: getInputValue(`lieu${i}_elements`),
+            points_vue_remarquables: getInputValue(`lieu${i}_points_vue`),
+            cinegenie: getInputValue(`lieu${i}_cinegenie`),
+            axes_camera: getInputValue(`lieu${i}_axes`),
+            moments_favorables: getInputValue(`lieu${i}_moments`),
+            ambiance_sonore: getInputValue(`lieu${i}_ambiance`),
+            adequation_narration: getInputValue(`lieu${i}_adequation`),
+            accessibilite: getInputValue(`lieu${i}_accessibilite`),
+            securite: getInputValue(`lieu${i}_securite`),
+            electricite: getInputValue(`lieu${i}_electricite`),
+            espace_equipe: getInputValue(`lieu${i}_espace`),
+            protection_meteo: getInputValue(`lieu${i}_protection`),
+            contraintes_meteo: getInputValue(`lieu${i}_contraintes_meteo`),
+            autorisations_necessaires: getInputValue(`lieu${i}_autorisations`)
+        };
+        
+        // Ajouter seulement si au moins le nom est rempli
+        if (lieuData.nom) {
+            formData.lieux.push(lieuData);
+        }
+    }
     
     return formData;
 }
@@ -589,7 +684,7 @@ async function submitReperage() {
 
 function exportPdf() {
     showNotification('Export PDF en cours...', 'info');
-    window.open(`${API_URL}/reperages/${currentReperageId}/export/pdf`, '_blank');
+    window.open(`/admin/reperage/${currentReperageId}/pdf`, '_blank');
 }
 
 // ============= NOTIFICATIONS =============
@@ -950,3 +1045,40 @@ function escapeHtml(text) {
     div.textContent = text;
     return div.innerHTML.replace(/\n/g, '<br>');
 }
+// AJOUTE CE CODE À LA FIN DE TON app.js POUR VOIR CE QUI SE PASSE
+
+console.log("=== DEBUG I18N ===");
+
+// Vérifier si les traductions se chargent
+document.addEventListener('DOMContentLoaded', async () => {
+    console.log("🔍 Test chargement traductions...");
+    
+    try {
+        const response = await fetch('/api/i18n/FR');
+        const data = await response.json();
+        console.log("✅ Traductions FR chargées:", data);
+        console.log("📝 Structure:", Object.keys(data));
+        
+        // Vérifier si les éléments existent
+        const elementsWithI18n = document.querySelectorAll('[data-i18n]');
+        console.log(`📌 ${elementsWithI18n.length} éléments avec data-i18n trouvés`);
+        
+        const elementsWithPlaceholder = document.querySelectorAll('[data-i18n-placeholder]');
+        console.log(`📌 ${elementsWithPlaceholder.length} éléments avec data-i18n-placeholder trouvés`);
+        
+        // Tester l'application des traductions
+        if (window.applyTranslations) {
+            console.log("🔧 Fonction applyTranslations existe");
+            window.translations = data;
+            window.applyTranslations();
+            console.log("✅ applyTranslations() appelée");
+        } else {
+            console.error("❌ Fonction applyTranslations introuvable!");
+        }
+        
+    } catch (error) {
+        console.error("❌ Erreur:", error);
+    }
+});
+
+console.log("=== FIN DEBUG I18N ===");

@@ -4,6 +4,7 @@ from werkzeug.utils import secure_filename
 from models import init_db, get_session, Reperage, Gardien, Lieu, Media, Message
 import os
 import json
+import secrets
 from datetime import datetime
 from PIL import Image
 import io
@@ -13,7 +14,8 @@ app = Flask(__name__)
 CORS(app)
 
 # Configuration
-UPLOAD_FOLDER = 'static/uploads'
+# ✅ Utiliser /data pour Railway volumes, fallback vers static/uploads en local
+UPLOAD_FOLDER = os.environ.get('UPLOAD_PATH', '/data/uploads') if os.path.exists('/data') else 'static/uploads'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'heic', 'webp', 'pdf', 'doc', 'docx', 'mp4', 'mov', 'avi'}
 MAX_FILE_SIZE = 500 * 1024 * 1024  # 500 MB (pour les vidéos)
 
@@ -26,6 +28,23 @@ os.makedirs(os.path.join(UPLOAD_FOLDER, 'thumbnails'), exist_ok=True)
 
 # Initialiser la base de données
 engine = init_db()
+
+def generate_token():
+    """Générer un token aléatoire sécurisé pour URLs"""
+    return secrets.token_urlsafe(16)  # 16 bytes = ~21 caractères
+
+def get_reperage_by_token_or_id(session, identifier):
+    """Récupérer un repérage par token (préféré) ou ID (fallback)"""
+    # D'abord essayer par token
+    reperage = session.query(Reperage).filter_by(token=identifier).first()
+    if reperage:
+        return reperage
+    
+    # Si pas trouvé et que c'est un nombre, essayer par ID
+    if identifier.isdigit():
+        return session.query(Reperage).filter_by(id=int(identifier)).first()
+    
+    return None
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -113,6 +132,7 @@ def create_reperage():
         data = request.json
         
         reperage = Reperage(
+            token=generate_token(),  # ✅ Générer token sécurisé
             langue_interface=data.get('langue_interface', 'FR'),
             fixer_nom=data.get('fixer_nom'),
             fixer_email=data.get('fixer_email'),
@@ -155,6 +175,32 @@ def update_reperage(id):
             reperage.territoire_data = json.dumps(data['territoire_data'])
         if 'episode_data' in data:
             reperage.episode_data = json.dumps(data['episode_data'])
+        
+        # ✅ NOUVEAU : Mise à jour des gardiens
+        if 'gardiens' in data:
+            # Supprimer les anciens gardiens
+            session.query(Gardien).filter_by(reperage_id=id).delete()
+            
+            # Créer les nouveaux gardiens
+            for gardien_data in data['gardiens']:
+                gardien = Gardien(
+                    reperage_id=id,
+                    **gardien_data
+                )
+                session.add(gardien)
+        
+        # ✅ NOUVEAU : Mise à jour des lieux
+        if 'lieux' in data:
+            # Supprimer les anciens lieux
+            session.query(Lieu).filter_by(reperage_id=id).delete()
+            
+            # Créer les nouveaux lieux
+            for lieu_data in data['lieux']:
+                lieu = Lieu(
+                    reperage_id=id,
+                    **lieu_data
+                )
+                session.add(lieu)
         
         reperage.updated_at = datetime.now()
         session.commit()
@@ -614,16 +660,17 @@ def admin_dashboard():
             'valides': valides
         }
         
-        # Filtres
-        query = session.query(Reperage)
+        # Filtres avec jointure sur Fixer
+        from models import Fixer
+        query = session.query(Reperage, Fixer).outerjoin(Fixer, Reperage.fixer_id == Fixer.id)
         
         statut_filter = request.args.get('statut')
         if statut_filter:
-            query = query.filter_by(statut=statut_filter)
+            query = query.filter(Reperage.statut == statut_filter)
         
         pays_filter = request.args.get('pays')
         if pays_filter:
-            query = query.filter_by(pays=pays_filter)
+            query = query.filter(Reperage.pays == pays_filter)
         
         search = request.args.get('search')
         if search:
@@ -632,16 +679,120 @@ def admin_dashboard():
                 (Reperage.fixer_nom.like(f'%{search}%'))
             )
         
-        reperages = query.order_by(Reperage.created_at.desc()).all()
+        results = query.order_by(Reperage.created_at.desc()).all()
+        
+        # Créer liste avec reperage + fixer
+        reperages_with_fixer = []
+        for reperage, fixer in results:
+            rep_dict = {
+                'reperage': reperage,
+                'fixer': fixer,
+                'lien_formulaire': fixer.lien_personnel if fixer else None
+            }
+            reperages_with_fixer.append(rep_dict)
         
         # Liste des pays pour le filtre
         pays_list = session.query(Reperage.pays).filter(Reperage.pays.isnot(None)).distinct().all()
         pays_list = [p[0] for p in pays_list]
         
+        # Liste des fixers pour modal création
+        from models import Fixer
+        fixers = session.query(Fixer).order_by(Fixer.nom, Fixer.prenom).all()
+        
         return render_template('admin_dashboard.html', 
-                             reperages=reperages, 
+                             reperages=reperages_with_fixer, 
                              stats=stats,
-                             pays_list=pays_list)
+                             pays_list=pays_list,
+                             fixers=fixers)
+    finally:
+        session.close()
+
+@app.route('/admin/reperages/create', methods=['POST'])
+def admin_create_reperage():
+    """Créer un nouveau repérage depuis le dashboard admin"""
+    session = get_session(engine)
+    try:
+        data = request.get_json()
+        
+        # Récupérer le fixer
+        from models import Fixer
+        fixer = session.query(Fixer).filter_by(id=data.get('fixer_id')).first()
+        
+        if not fixer:
+            return jsonify({'error': 'Correspondant non trouvé'}), 404
+        
+        # Créer le repérage
+        reperage = Reperage(
+            token=generate_token(),  # ✅ Générer token sécurisé
+            region=data.get('region'),
+            pays=data.get('pays'),
+            fixer_id=fixer.id,
+            fixer_nom=fixer.nom,
+            fixer_prenom=fixer.prenom,
+            fixer_email=fixer.email,
+            fixer_telephone=fixer.telephone,
+            statut='brouillon',
+            notes_admin=data.get('notes_admin'),
+            image_region=data.get('image_region')
+        )
+        
+        session.add(reperage)
+        session.commit()
+        
+        return jsonify({
+            'success': True,
+            'reperage_id': reperage.id,
+            'message': 'Repérage créé avec succès'
+        }), 201
+        
+    except Exception as e:
+        session.rollback()
+        print(f"Erreur création repérage: {e}")
+        return jsonify({'error': str(e)}), 500
+    finally:
+        session.close()
+
+@app.route('/admin/reperages/<int:reperage_id>/update', methods=['PUT'])
+def admin_update_reperage(reperage_id):
+    """Modifier un repérage depuis le dashboard admin"""
+    session = get_session(engine)
+    try:
+        data = request.get_json()
+        
+        # Récupérer le repérage
+        reperage = session.query(Reperage).filter_by(id=reperage_id).first()
+        if not reperage:
+            return jsonify({'error': 'Repérage non trouvé'}), 404
+        
+        # Récupérer le fixer
+        from models import Fixer
+        fixer = session.query(Fixer).filter_by(id=data.get('fixer_id')).first()
+        if not fixer:
+            return jsonify({'error': 'Correspondant non trouvé'}), 404
+        
+        # Mettre à jour le repérage
+        reperage.region = data.get('region')
+        reperage.pays = data.get('pays')
+        reperage.fixer_id = fixer.id
+        reperage.fixer_nom = fixer.nom
+        reperage.fixer_prenom = fixer.prenom
+        reperage.fixer_email = fixer.email
+        reperage.fixer_telephone = fixer.telephone
+        reperage.statut = data.get('statut', 'brouillon')
+        reperage.notes_admin = data.get('notes_admin')
+        reperage.image_region = data.get('image_region')
+        
+        session.commit()
+        
+        return jsonify({
+            'success': True,
+            'message': 'Repérage modifié avec succès'
+        }), 200
+        
+    except Exception as e:
+        session.rollback()
+        print(f"Erreur modification repérage: {e}")
+        return jsonify({'error': str(e)}), 500
     finally:
         session.close()
 
@@ -663,13 +814,19 @@ def admin_reperage_detail(id):
         lieux = session.query(Lieu).filter_by(reperage_id=id).all()
         medias = session.query(Media).filter_by(reperage_id=id).all()
         
+        # Récupérer le fixer associé
+        fixer = None
+        if reperage.fixer_id:
+            fixer = session.query(Fixer).filter_by(id=reperage.fixer_id).first()
+        
         return render_template('admin_reperage_detail.html',
                              reperage=reperage,
                              territoire=territoire,
                              episode=episode,
                              gardiens=gardiens,
                              lieux=lieux,
-                             medias=medias)
+                             medias=medias,
+                             fixer=fixer)
     finally:
         session.close()
 
@@ -710,37 +867,71 @@ def admin_supprimer_reperage(id):
         if not reperage:
             return "Repérage non trouvé", 404
         
-        # Supprimer tous les médias associés
-        medias = session.query(Media).filter_by(reperage_id=id).all()
-        for media in medias:
-            # Supprimer le fichier physique
-            if os.path.exists(media.chemin_fichier):
-                os.remove(media.chemin_fichier)
-            session.delete(media)
+        print(f"🗑️ Suppression repérage ID {id}...")
         
-        # Supprimer tous les gardiens
-        gardiens = session.query(Gardien).filter_by(reperage_id=id).all()
-        for gardien in gardiens:
-            session.delete(gardien)
+        # 1. Supprimer tous les messages du chat
+        try:
+            messages = session.query(Message).filter_by(reperage_id=id).all()
+            for message in messages:
+                session.delete(message)
+            print(f"   ✅ {len(messages)} messages supprimés")
+        except Exception as e:
+            print(f"   ⚠️ Erreur suppression messages: {e}")
         
-        # Supprimer tous les lieux
-        lieux = session.query(Lieu).filter_by(reperage_id=id).all()
-        for lieu in lieux:
-            session.delete(lieu)
+        # 2. Supprimer tous les médias associés
+        try:
+            medias = session.query(Media).filter_by(reperage_id=id).all()
+            for media in medias:
+                # Supprimer le fichier physique
+                try:
+                    if os.path.exists(media.chemin_fichier):
+                        os.remove(media.chemin_fichier)
+                except:
+                    pass
+                session.delete(media)
+            print(f"   ✅ {len(medias)} médias supprimés")
+        except Exception as e:
+            print(f"   ⚠️ Erreur suppression médias: {e}")
         
-        # Supprimer le dossier uploads du repérage
-        reperage_folder = os.path.join(app.config['UPLOAD_FOLDER'], str(id))
-        if os.path.exists(reperage_folder):
-            import shutil
-            shutil.rmtree(reperage_folder)
+        # 3. Supprimer tous les gardiens
+        try:
+            gardiens = session.query(Gardien).filter_by(reperage_id=id).all()
+            for gardien in gardiens:
+                session.delete(gardien)
+            print(f"   ✅ {len(gardiens)} gardiens supprimés")
+        except Exception as e:
+            print(f"   ⚠️ Erreur suppression gardiens: {e}")
         
-        # Supprimer le repérage
+        # 4. Supprimer tous les lieux
+        try:
+            lieux = session.query(Lieu).filter_by(reperage_id=id).all()
+            for lieu in lieux:
+                session.delete(lieu)
+            print(f"   ✅ {len(lieux)} lieux supprimés")
+        except Exception as e:
+            print(f"   ⚠️ Erreur suppression lieux: {e}")
+        
+        # 5. Supprimer le dossier uploads du repérage
+        try:
+            reperage_folder = os.path.join(app.config['UPLOAD_FOLDER'], str(id))
+            if os.path.exists(reperage_folder):
+                import shutil
+                shutil.rmtree(reperage_folder)
+                print(f"   ✅ Dossier uploads supprimé")
+        except Exception as e:
+            print(f"   ⚠️ Erreur suppression dossier: {e}")
+        
+        # 6. Supprimer le repérage
         session.delete(reperage)
         session.commit()
+        print(f"✅ Repérage ID {id} supprimé avec succès!")
         
         return redirect('/admin')
     except Exception as e:
         session.rollback()
+        print(f"❌ ERREUR SUPPRESSION REPÉRAGE ID {id}: {e}")
+        import traceback
+        traceback.print_exc()
         return f"Erreur lors de la suppression: {e}", 500
     finally:
         session.close()
@@ -748,13 +939,17 @@ def admin_supprimer_reperage(id):
 @app.route('/admin/reperage/<int:id>/pdf')
 def admin_generate_pdf(id):
     """Générer un PDF du repérage - VERSION AMÉLIORÉE"""
-    from reportlab.lib.pagesizes import A4
-    from reportlab.lib import colors
-    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-    from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, PageBreak
-    from reportlab.lib.units import cm
-    from reportlab.lib.enums import TA_CENTER
-    from io import BytesIO
+    try:
+        from reportlab.lib.pagesizes import A4
+        from reportlab.lib import colors
+        from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+        from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, PageBreak
+        from reportlab.lib.units import cm
+        from reportlab.lib.enums import TA_CENTER
+        from io import BytesIO
+    except ImportError as e:
+        print(f"❌ ERREUR: ReportLab non installé - {e}")
+        return f"Erreur: ReportLab n'est pas installé. Exécutez: pip install reportlab --break-system-packages", 500
     
     session = get_session(engine)
     try:
@@ -928,6 +1123,11 @@ def admin_generate_pdf(id):
             as_attachment=True,
             download_name=filename
         )
+    except Exception as e:
+        print(f"❌ ERREUR GÉNÉRATION PDF: {e}")
+        import traceback
+        traceback.print_exc()
+        return f"Erreur lors de la génération du PDF: {str(e)}", 500
     finally:
         session.close()
 
@@ -982,32 +1182,69 @@ def admin_download_photos(id):
 
 @app.route('/admin/fixers')
 def admin_fixers():
-    """Gestion des fixers"""
+    """Gestion des fixers avec filtres enrichis"""
     from models import Fixer
     session = get_session(engine)
     try:
-        fixers = session.query(Fixer).order_by(Fixer.created_at.desc()).all()
-        return render_template('admin_fixers.html', fixers=fixers)
+        # Requête de base
+        query = session.query(Fixer)
+        
+        # Filtre par recherche (nom, prénom, société)
+        search = request.args.get('search')
+        if search:
+            query = query.filter(
+                (Fixer.nom.like(f'%{search}%')) |
+                (Fixer.prenom.like(f'%{search}%')) |
+                (Fixer.societe.like(f'%{search}%'))
+            )
+        
+        # Filtre par pays
+        pays_filter = request.args.get('pays')
+        if pays_filter:
+            query = query.filter(Fixer.pays == pays_filter)
+        
+        # Filtre par langue
+        langue_filter = request.args.get('langue')
+        if langue_filter:
+            query = query.filter(Fixer.langues_parlees.like(f'%{langue_filter}%'))
+        
+        # Filtre par statut
+        statut_filter = request.args.get('statut')
+        if statut_filter == 'actif':
+            query = query.filter(Fixer.actif == True)
+        elif statut_filter == 'inactif':
+            query = query.filter(Fixer.actif == False)
+        
+        # Récupérer les fixers
+        fixers = query.order_by(Fixer.created_at.desc()).all()
+        
+        # Liste des pays pour le filtre
+        pays_list = session.query(Fixer.pays).filter(Fixer.pays.isnot(None)).distinct().all()
+        pays_list = sorted([p[0] for p in pays_list if p[0]])
+        
+        return render_template('admin_fixers.html', fixers=fixers, pays_list=pays_list)
     finally:
         session.close()
 
-@app.route('/admin/fixer/new', methods=['POST'])
+@app.route('/admin/fixer/new', methods=['GET', 'POST'])
 def admin_create_fixer():
     """Créer un nouveau fixer"""
     from models import Fixer
     from slugify import slugify
     import secrets
     
+    # GET : Afficher le formulaire
+    if request.method == 'GET':
+        return render_template('admin_fixer_edit.html', fixer=None)
+    
+    # POST : Créer le fixer
     session = get_session(engine)
     try:
-        # Récupérer les données du formulaire
+        # Récupérer les données de base
         prenom = request.form.get('prenom')
         nom = request.form.get('nom')
         email = request.form.get('email')
         telephone = request.form.get('telephone')
-        pays = request.form.get('pays')
-        region = request.form.get('region')
-        langue_preferee = request.form.get('langue_preferee', 'FR')
         
         # Générer le token unique
         token = secrets.token_urlsafe(6)[:8]
@@ -1018,24 +1255,75 @@ def admin_create_fixer():
         # Créer le lien personnel
         lien = f"/fixer/{slug}-{token}"
         
-        # Créer le fixer
+        # Récupérer les langues parlées (checkboxes multiples)
+        langues_parlees_list = request.form.getlist('langues_parlees')
+        langues_parlees = ','.join(langues_parlees_list) if langues_parlees_list else None
+        
+        # Créer le fixer avec TOUS les champs
         fixer = Fixer(
+            # Identité
             prenom=prenom,
             nom=nom,
             email=email,
             telephone=telephone,
-            pays=pays,
-            region=region,
-            langue_preferee=langue_preferee,
+            telephone_2=request.form.get('telephone_2'),
+            
+            # Professionnel
+            societe=request.form.get('societe'),
+            fonction=request.form.get('fonction'),
+            site_web=request.form.get('site_web'),
+            numero_siret=request.form.get('numero_siret'),
+            
+            # Adresse
+            adresse_1=request.form.get('adresse_1'),
+            adresse_2=request.form.get('adresse_2'),
+            code_postal=request.form.get('code_postal'),
+            ville=request.form.get('ville'),
+            pays=request.form.get('pays'),
+            region=request.form.get('region'),
+            
+            # Profil
+            photo_profil_url=request.form.get('photo_profil_url'),
+            bio=request.form.get('bio'),
+            specialites=request.form.get('specialites'),
+            
+            # Langues
+            langues_parlees=langues_parlees,
+            langue_preferee=request.form.get('langue_preferee', 'FR'),
+            
+            # Système
             token_unique=token,
             lien_personnel=lien,
-            actif=True
+            actif=bool(request.form.get('actif')),
+            notes_internes=request.form.get('notes_internes')
         )
         
         session.add(fixer)
         session.commit()
         
         return redirect('/admin/fixers')
+    except Exception as e:
+        session.rollback()
+        print(f"Erreur création fixer: {e}")
+        return f"Erreur: {e}", 500
+    finally:
+        session.close()
+
+@app.route('/admin/fixer/<int:id>')
+def admin_fixer_detail(id):
+    """Page détail d'un fixer"""
+    from models import Fixer
+    
+    session = get_session(engine)
+    try:
+        fixer = session.query(Fixer).filter_by(id=id).first()
+        if not fixer:
+            return "Fixer non trouvé", 404
+        
+        # Récupérer les repérages associés
+        reperages = session.query(Reperage).filter_by(fixer_id=id).order_by(Reperage.created_at.desc()).all()
+        
+        return render_template('admin_fixer_detail.html', fixer=fixer, reperages=reperages)
     finally:
         session.close()
 
@@ -1051,21 +1339,93 @@ def admin_edit_fixer(id):
             return "Fixer non trouvé", 404
         
         if request.method == 'POST':
-            # Mettre à jour les données
+            # Récupérer les langues parlées (checkboxes multiples)
+            langues_parlees_list = request.form.getlist('langues_parlees')
+            langues_parlees = ','.join(langues_parlees_list) if langues_parlees_list else None
+            
+            # Fonction helper pour convertir chaîne vide en None
+            def empty_to_none(value):
+                return value if value and value.strip() else None
+            
+            # Mettre à jour TOUS les champs
+            # Identité
             fixer.prenom = request.form.get('prenom')
             fixer.nom = request.form.get('nom')
             fixer.email = request.form.get('email')
             fixer.telephone = request.form.get('telephone')
-            fixer.pays = request.form.get('pays')
-            fixer.region = request.form.get('region')
-            fixer.langue_preferee = request.form.get('langue_preferee', 'FR')
-            fixer.actif = request.form.get('actif') == 'on'
+            fixer.telephone_2 = empty_to_none(request.form.get('telephone_2'))
             
-            session.commit()
-            return redirect('/admin/fixers')
+            # Professionnel
+            fixer.societe = empty_to_none(request.form.get('societe'))
+            fixer.fonction = empty_to_none(request.form.get('fonction'))
+            fixer.site_web = empty_to_none(request.form.get('site_web'))
+            fixer.numero_siret = empty_to_none(request.form.get('numero_siret'))
+            
+            # Adresse
+            fixer.adresse_1 = empty_to_none(request.form.get('adresse_1'))
+            fixer.adresse_2 = empty_to_none(request.form.get('adresse_2'))
+            fixer.code_postal = empty_to_none(request.form.get('code_postal'))
+            fixer.ville = request.form.get('ville')
+            fixer.pays = request.form.get('pays')
+            fixer.region = empty_to_none(request.form.get('region'))
+            
+            # Profil
+            fixer.photo_profil_url = empty_to_none(request.form.get('photo_profil_url'))
+            fixer.bio = empty_to_none(request.form.get('bio'))
+            fixer.specialites = empty_to_none(request.form.get('specialites'))
+            
+            # Langues
+            fixer.langues_parlees = langues_parlees
+            fixer.langue_preferee = request.form.get('langue_preferee', 'FR')
+            
+            # Système
+            fixer.actif = bool(request.form.get('actif'))
+            fixer.notes_internes = empty_to_none(request.form.get('notes_internes'))
+            
+            try:
+                session.commit()
+                return redirect('/admin/fixers')
+            except Exception as e:
+                session.rollback()
+                print(f"❌ ERREUR SAUVEGARDE FIXER: {e}")
+                return f"Erreur lors de la sauvegarde: {e}", 500
         
         # GET: afficher le formulaire
         return render_template('admin_fixer_edit.html', fixer=fixer)
+    finally:
+        session.close()
+
+@app.route('/formulaire/<token>')
+def formulaire_reperage(token):
+    """Formulaire pour un repérage spécifique (sécurisé par token)"""
+    from models import Fixer
+    
+    session = get_session(engine)
+    try:
+        # Récupérer le repérage par token
+        reperage = get_reperage_by_token_or_id(session, token)
+        if not reperage:
+            return "Repérage non trouvé", 404
+        
+        # Récupérer le fixer associé
+        fixer = session.query(Fixer).filter_by(id=reperage.fixer_id).first() if reperage.fixer_id else None
+        
+        if not fixer:
+            return "Aucun correspondant affecté à ce repérage", 404
+        
+        # Préparer données FIXER_DATA (avec infos du REPÉRAGE, pas du fixer)
+        FIXER_DATA = {
+            'prenom': fixer.prenom,
+            'nom': fixer.nom,
+            'email': fixer.email,
+            'telephone': fixer.telephone,
+            'pays': reperage.pays,  # ← REPÉRAGE, pas fixer
+            'region': reperage.region,  # ← REPÉRAGE, pas fixer
+            'langue_preferee': fixer.langue_preferee or 'FR',
+            'image_region': reperage.image_region if reperage.image_region else 'https://destinationsetcuisines.com/doc/multilingue/bannerreperage.jpg'
+        }
+        
+        return render_template('index.html', FIXER_DATA=FIXER_DATA, REPERAGE_ID=reperage.id)
     finally:
         session.close()
 
@@ -1096,6 +1456,15 @@ def fixer_form(fixer_slug):
         # Si un brouillon existe, passer son ID au template
         reperage_id = reperage_existant.id if reperage_existant else None
         
+        # Préparer données FIXER_DATA avec image du repérage si disponible
+        fixer_data = {
+            'fixer_nom': fixer.nom,
+            'fixer_prenom': fixer.prenom,
+            'region': reperage_existant.region if reperage_existant else fixer.region,
+            'pays': reperage_existant.pays if reperage_existant else fixer.pays,
+            'image_region': reperage_existant.image_region if reperage_existant else None
+        }
+        
         # Renvoyer le formulaire avec données pré-remplies
         return render_template('index.html', 
                              fixer_id=fixer.id,
@@ -1104,11 +1473,7 @@ def fixer_form(fixer_slug):
                              fixer_telephone=fixer.telephone or '',
                              langue_default=fixer.langue_preferee,
                              reperage_id=reperage_id,
-                             FIXER_DATA={
-                                 'fixer_nom': f"{fixer.prenom} {fixer.nom}",
-                                 'region': fixer.region,
-                                 'pays': fixer.pays
-                             })
+                             FIXER_DATA=fixer_data)
     finally:
         session.close()
 
@@ -1116,6 +1481,7 @@ def fixer_form(fixer_slug):
 def admin_logout():
     """Déconnexion admin (placeholder)"""
     return redirect('/admin')
+
 
 if __name__ == '__main__':
     print("\n" + "="*60)

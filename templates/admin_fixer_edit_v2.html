@@ -391,18 +391,18 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label>Nom <span class="required">*</span></label>
-                        <input type="text" name="nom" value="{{ (fixer.nom if fixer else '') or '' }}" required>
+                        <input type="text" name="nom" value="{{ fixer.nom if fixer else '' }}" required>
                     </div>
                     <div class="form-group">
                         <label>Prénom <span class="required">*</span></label>
-                        <input type="text" name="prenom" value="{{ (fixer.prenom if fixer else '') or '' }}" required>
+                        <input type="text" name="prenom" value="{{ fixer.prenom if fixer else '' }}" required>
                     </div>
                 </div>
 
                 <div class="form-row full">
                     <div class="form-group">
                         <label>Photo de profil (URL)</label>
-                        <input type="url" name="photo_profil_url" id="photoUrl" value="{{ (fixer.photo_profil_url if fixer else '') or '' }}" oninput="updatePhotoPreview()">
+                        <input type="url" name="photo_profil_url" id="photoUrl" value="{{ fixer.photo_profil_url if fixer else '' }}" oninput="updatePhotoPreview()">
                         <small>URL d'une image hébergée en ligne (JPG, PNG, WebP...)</small>
                     </div>
                 </div>
@@ -418,7 +418,7 @@
                 <div class="form-row full">
                     <div class="form-group">
                         <label>Fonction / Poste</label>
-                        <input type="text" name="fonction" value="{{ (fixer.fonction if fixer else '') or '' }}" placeholder="Ex: Guide touristique, Producteur local...">
+                        <input type="text" name="fonction" value="{{ fixer.fonction if fixer else '' }}" placeholder="Ex: Guide touristique, Producteur local...">
                     </div>
                 </div>
 
@@ -436,58 +436,58 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label>Email <span class="required">*</span></label>
-                        <input type="email" name="email" value="{{ (fixer.email if fixer else '') or '' }}" required>
+                        <input type="email" name="email" value="{{ fixer.email if fixer else '' }}" required>
                     </div>
                     <div class="form-group">
                         <label>Téléphone principal <span class="required">*</span></label>
-                        <input type="tel" name="telephone" value="{{ (fixer.telephone if fixer else '') or '' }}" required>
+                        <input type="tel" name="telephone" value="{{ fixer.telephone if fixer else '' }}" required>
                     </div>
                 </div>
 
                 <div class="form-row">
                     <div class="form-group">
                         <label>Téléphone secondaire</label>
-                        <input type="tel" name="telephone_2" value="{{ (fixer.telephone_2 if fixer else '') or '' }}">
+                        <input type="tel" name="telephone_2" value="{{ fixer.telephone_2 if fixer else '' }}">
                     </div>
                     <div class="form-group">
                         <label>Site internet</label>
-                        <input type="url" name="site_web" value="{{ (fixer.site_web if fixer else '') or '' }}" placeholder="https://...">
+                        <input type="url" name="site_web" value="{{ fixer.site_web if fixer else '' }}" placeholder="https://...">
                     </div>
                 </div>
 
                 <div class="form-row full">
                     <div class="form-group">
                         <label>Adresse ligne 1</label>
-                        <input type="text" name="adresse_1" value="{{ (fixer.adresse_1 if fixer else '') or '' }}" placeholder="Numéro et nom de rue">
+                        <input type="text" name="adresse_1" value="{{ fixer.adresse_1 if fixer else '' }}" placeholder="Numéro et nom de rue">
                     </div>
                 </div>
 
                 <div class="form-row full">
                     <div class="form-group">
                         <label>Adresse ligne 2</label>
-                        <input type="text" name="adresse_2" value="{{ (fixer.adresse_2 if fixer else '') or '' }}" placeholder="Complément d'adresse (Bât., Étage...)">
+                        <input type="text" name="adresse_2" value="{{ fixer.adresse_2 if fixer else '' }}" placeholder="Complément d'adresse (Bât., Étage...)">
                     </div>
                 </div>
 
                 <div class="form-row">
                     <div class="form-group">
                         <label>Code postal</label>
-                        <input type="text" name="code_postal" value="{{ (fixer.code_postal if fixer else '') or '' }}">
+                        <input type="text" name="code_postal" value="{{ fixer.code_postal if fixer else '' }}">
                     </div>
                     <div class="form-group">
                         <label>Ville <span class="required">*</span></label>
-                        <input type="text" name="ville" value="{{ (fixer.ville if fixer else '') or '' }}" required>
+                        <input type="text" name="ville" value="{{ fixer.ville if fixer else '' }}" required>
                     </div>
                 </div>
 
                 <div class="form-row">
                     <div class="form-group">
                         <label>Pays <span class="required">*</span></label>
-                        <input type="text" name="pays" value="{{ (fixer.pays if fixer else '') or '' }}" required>
+                        <input type="text" name="pays" value="{{ fixer.pays if fixer else '' }}" required>
                     </div>
                     <div class="form-group">
                         <label>Région</label>
-                        <input type="text" name="region" value="{{ (fixer.region if fixer else '') or '' }}">
+                        <input type="text" name="region" value="{{ fixer.region if fixer else '' }}">
                     </div>
                 </div>
             </div>
@@ -497,11 +497,11 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label>Société / Agence</label>
-                        <input type="text" name="societe" value="{{ (fixer.societe if fixer else '') or '' }}">
+                        <input type="text" name="societe" value="{{ fixer.societe if fixer else '' }}">
                     </div>
                     <div class="form-group">
                         <label>Numéro SIRET</label>
-                        <input type="text" name="numero_siret" value="{{ (fixer.numero_siret if fixer else '') or '' }}" placeholder="14 chiffres">
+                        <input type="text" name="numero_siret" value="{{ fixer.numero_siret if fixer else '' }}" placeholder="14 chiffres">
                     </div>
                 </div>
 

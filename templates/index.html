@@ -3,8 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bible du Repérage - Les Gardiens de la Tradition</title>
+    <title>Préparation Repérage - RootsKeepers</title>
     <link rel="stylesheet" href="/static/css/style.css">
+    <!-- Quill WYSIWYG Editor -->
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
     
@@ -12,12 +16,13 @@
     <header class="{% if FIXER_DATA %}header-fixer{% endif %}">
         {% if FIXER_DATA and FIXER_DATA.region %}
         <!-- Header personnalisé pour les fixers avec image de fond -->
-        <div class="header-fixer-banner" style="background-image: url('https://extranet.destinationsetcuisines.com/site/producers/banner.jpg');">
+        <div class="header-fixer-banner" style="background-image: url('{% if FIXER_DATA.image_region %}{{ FIXER_DATA.image_region }}{% else %}https://destinationsetcuisines.com/doc/multilingue/bannerreperage.jpg{% endif %}');">
             <div class="header-fixer-overlay">
+                <img src="https://destinationsetcuisines.com/doc/logoRK.png" alt="RootsKeepers" class="logo-header-fixer">
                 <div class="header-fixer-content">
-                    <h1 class="header-fixer-region">{{ FIXER_DATA.region }}</h1>
-                    <div class="header-fixer-name">{{ FIXER_DATA.fixer_nom }}</div>
-                    <div class="header-fixer-subtitle">Les Gardiens de la Tradition</div>
+                    <h1 class="header-fixer-title"></h1>
+                    <h2 class="header-fixer-region">{{ FIXER_DATA.region }}</h2>
+                    <div class="header-fixer-name">{{ FIXER_DATA.prenom }} {{ FIXER_DATA.nom }}</div>
                 </div>
             </div>
         </div>
@@ -33,8 +38,8 @@
         <!-- Header standard pour l'admin -->
         <div class="header-content">
             <div class="header-title">
-                <h1>Bible du Repérage</h1>
-                <div class="subtitle">Les Gardiens de la Tradition</div>
+                <h1></h1>
+                <div class="subtitle">RootsKeepers</div>
             </div>
             <div class="language-selector">
                 <button class="lang-btn" data-lang="FR">🇫🇷 FR</button>
@@ -56,7 +61,7 @@
                         <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
                         <polyline points="22 4 12 14.01 9 11.01"></polyline>
                     </svg>
-                    <span>Progression du repérage</span>
+                    <span>Progress..</span>
                 </div>
                 <div class="progress-percentage" id="progress-percentage">0%</div>
             </div>
@@ -69,33 +74,33 @@
             </div>
         </div>
         
-        <!-- INTRODUCTION -->
+        <!-- INTRODUCTION 
         <div class="intro-box">
             <p>Le repérage n'est pas qu'une étape logistique : c'est une phase créative et stratégique qui conditionne la qualité finale de l'épisode.</p>
             <p>Il valide la faisabilité narrative, anticipe les choix artistiques, prépare la logistique technique et optimise les ressources budgétaires.</p>
-            <p>Ce document est votre Bible. <span class="highlight">Remplissez-le avec soin, précision et sensibilité culturelle.</span></p>
-        </div>
+            <p>Ce document est votre Bible. <span class="highlight">Remplissez-le avec soin, précision et sensibilité culturelle.</span></p> 
+        </div>-->
         
-        <!-- INFORMATIONS FIXER -->
+        <!-- INFORMATIONS CORRESPONDANT -->
         <section>
             <div class="section-header">
-                <div class="section-icon">👤</div>
-                <h2 class="section-title">INFORMATIONS FIXER</h2>
+                <i data-lucide="user-round" style="width: 32px; height: 32px;"></i>
+                <h2 class="section-title" data-i18n="fixer.title">INFORMATIONS SUR LE CORRESPONDANT LOCAL</h2>
             </div>
             
             <div class="text-content">
                 <div class="fields-grid">
                     <div class="field-group">
-                        <label class="field-label" data-i18n="territoire.nom">Nom</label>
-                        <input type="text" name="fixer_nom" placeholder="Nom complet">
+                        <label class="field-label" data-i18n="fixer.nom">Nom</label>
+                        <input type="text" name="fixer_nom" placeholder="Nom complet" data-i18n-placeholder="fixer.nom_placeholder">
                     </div>
                     <div class="field-group">
-                        <label class="field-label" data-i18n="territoire.email">Email</label>
-                        <input type="email" name="fixer_email" placeholder="email@example.com">
+                        <label class="field-label" data-i18n="fixer.email">Email</label>
+                        <input type="email" name="fixer_email" placeholder="email@example.com" data-i18n-placeholder="fixer.email_placeholder">
                     </div>
                     <div class="field-group">
-                        <label class="field-label" data-i18n="territoire.telephone">Téléphone</label>
-                        <input type="tel" name="fixer_telephone" placeholder="+33 6 12 34 56 78">
+                        <label class="field-label" data-i18n="fixer.telephone">Téléphone</label>
+                        <input type="tel" name="fixer_telephone" placeholder="+33 6 12 34 56 78" data-i18n-placeholder="fixer.telephone_placeholder">
                     </div>
                 </div>
             </div>
@@ -104,8 +109,8 @@
         <!-- GRILLE DE REPÉRAGE -->
         <section>
             <div class="section-header">
-                <div class="section-icon">📋</div>
-                <h2 class="section-title">GRILLE DE REPÉRAGE</h2>
+                <i data-lucide="clipboard-list" style="width: 32px; height: 32px;"></i>
+                <h2 class="section-title" data-i18n="grille.title">GRILLE DE REPÉRAGE</h2>
             </div>
             
             <div class="tabs-container">
@@ -113,23 +118,23 @@
                 
                 <div class="tabs-nav">
                     <button class="tab-btn active" data-tab="territoire">
-                        <span class="tab-icon">🌍</span>
+                        <i data-lucide="globe" style="width: 20px; height: 20px;"></i>
                         <span data-i18n="tabs.territoire">TERRITOIRE</span>
                     </button>
                     <button class="tab-btn" data-tab="episode">
-                        <span class="tab-icon">🎬</span>
+                        <i data-lucide="clapperboard" style="width: 20px; height: 20px;"></i>
                         <span data-i18n="tabs.episode">ÉPISODE</span>
                     </button>
                     <button class="tab-btn" data-tab="gardiens">
-                        <span class="tab-icon">👥</span>
+                        <i data-lucide="users" style="width: 20px; height: 20px;"></i>
                         <span data-i18n="tabs.gardiens">GARDIENS</span>
                     </button>
                     <button class="tab-btn" data-tab="gardiens-details">
-                        <span class="tab-icon">📝</span>
+                        <i data-lucide="file-text" style="width: 20px; height: 20px;"></i>
                         <span data-i18n="tabs.gardiens_details">GARDIENS (DÉTAILS)</span>
                     </button>
                     <button class="tab-btn" data-tab="lieux">
-                        <span class="tab-icon">📍</span>
+                        <i data-lucide="map-pin" style="width: 20px; height: 20px;"></i>
                         <span data-i18n="tabs.lieux">LIEUX</span>
                     </button>
                 </div>
@@ -141,51 +146,51 @@
                     <div class="fields-grid">
                         <div class="field-group">
                             <label class="field-label" data-i18n="territoire.pays">Pays</label>
-                            <input type="text" name="pays">
+                            <input type="text" name="pays" data-i18n-placeholder="territoire.pays">
                         </div>
                         <div class="field-group">
                             <label class="field-label" data-i18n="territoire.region">Région / Province</label>
-                            <input type="text" name="region">
+                            <input type="text" name="region" data-i18n-placeholder="territoire.region">
                         </div>
                         <div class="field-group">
                             <label class="field-label" data-i18n="territoire.ville">Ville(s) principale(s)</label>
-                            <input type="text" name="ville">
+                            <input type="text" name="ville" data-i18n-placeholder="territoire.ville">
                         </div>
                         <div class="field-group">
                             <label class="field-label" data-i18n="territoire.population">Population (estimation)</label>
-                            <input type="text" name="population">
+                            <input type="text" name="population" data-i18n-placeholder="territoire.population">
                         </div>
                         <div class="field-group">
                             <label class="field-label" data-i18n="territoire.langues">Langue(s) parlée(s)</label>
-                            <input type="text" name="langues">
+                            <input type="text" name="langues" data-i18n-placeholder="territoire.langues">
                         </div>
                         <div class="field-group">
                             <label class="field-label" data-i18n="territoire.climat">Climat / Saison de tournage envisagée</label>
-                            <input type="text" name="climat">
+                            <input type="text" name="climat" data-i18n-placeholder="territoire.climat">
                         </div>
                         <div class="field-group" style="grid-column: span 2;">
                             <label class="field-label" data-i18n="territoire.histoire">Histoire / Contexte culturel</label>
-                            <textarea name="histoire" rows="4"></textarea>
+                            <textarea name="histoire" rows="4" data-i18n-placeholder="territoire.histoire"></textarea></textarea>
                         </div>
                         <div class="field-group" style="grid-column: span 2;">
                             <label class="field-label" data-i18n="territoire.traditions">Traditions culinaires / artisanales dominantes</label>
-                            <textarea name="traditions" rows="3"></textarea>
+                            <textarea name="traditions" rows="3" data-i18n-placeholder="territoire.traditions"></textarea></textarea>
                         </div>
                         <div class="field-group" style="grid-column: span 2;">
                             <label class="field-label" data-i18n="territoire.fetes">Fêtes locales / Calendrier culturel</label>
-                            <textarea name="fetes" rows="3"></textarea>
+                            <textarea name="fetes" rows="3" data-i18n-placeholder="territoire.fetes"></textarea></textarea>
                         </div>
                         <div class="field-group">
                             <label class="field-label" data-i18n="territoire.acces">Accès depuis capitale / aéroport</label>
-                            <input type="text" name="acces">
+                            <input type="text" name="acces" data-i18n-placeholder="territoire.acces">
                         </div>
                         <div class="field-group">
                             <label class="field-label" data-i18n="territoire.hebergement">Hébergement équipe disponible</label>
-                            <input type="text" name="hebergement">
+                            <input type="text" name="hebergement" data-i18n-placeholder="territoire.hebergement">
                         </div>
                         <div class="field-group" style="grid-column: span 2;">
                             <label class="field-label" data-i18n="territoire.contacts">Contacts locaux utiles</label>
-                            <textarea name="contacts" rows="2"></textarea>
+                            <textarea name="contacts" rows="2" data-i18n-placeholder="territoire.contacts"></textarea></textarea>
                         </div>
                     </div>
                 </div>
@@ -197,39 +202,39 @@
                     <div class="fields-grid">
                         <div class="field-group" style="grid-column: span 2;">
                             <label class="field-label" data-i18n="episode.angle">Angle narratif choisi</label>
-                            <textarea name="angle" rows="3"></textarea>
+                            <textarea name="angle" rows="3" data-i18n-placeholder="episode.angle"></textarea></textarea>
                         </div>
                         <div class="field-group">
                             <label class="field-label" data-i18n="episode.fete">Fête ou événement central</label>
-                            <input type="text" name="fete">
+                            <input type="text" name="fete" data-i18n-placeholder="episode.fete">
                         </div>
                         <div class="field-group">
                             <label class="field-label" data-i18n="episode.contraintes">Contraintes temporelles</label>
-                            <input type="text" name="contraintes">
+                            <input type="text" name="contraintes" data-i18n-placeholder="episode.contraintes">
                         </div>
                         <div class="field-group" style="grid-column: span 2;">
                             <label class="field-label" data-i18n="episode.arc">Arc dramatique envisagé</label>
-                            <textarea name="arc" rows="4"></textarea>
+                            <textarea name="arc" rows="4" data-i18n-placeholder="episode.arc"></textarea></textarea>
                         </div>
                         <div class="field-group" style="grid-column: span 2;">
                             <label class="field-label" data-i18n="episode.moments">Moments-clés identifiés</label>
-                            <textarea name="moments" rows="4"></textarea>
+                            <textarea name="moments" rows="4" data-i18n-placeholder="episode.moments"></textarea></textarea>
                         </div>
                         <div class="field-group" style="grid-column: span 2;">
                             <label class="field-label" data-i18n="episode.sensibles">Éléments culturellement sensibles</label>
-                            <textarea name="sensibles" rows="3"></textarea>
+                            <textarea name="sensibles" rows="3" data-i18n-placeholder="episode.sensibles"></textarea></textarea>
                         </div>
                         <div class="field-group" style="grid-column: span 2;">
                             <label class="field-label" data-i18n="episode.autorisations">Autorisations préalables nécessaires</label>
-                            <textarea name="autorisations" rows="3"></textarea>
+                            <textarea name="autorisations" rows="3" data-i18n-placeholder="episode.autorisations"></textarea></textarea>
                         </div>
                         <div class="field-group">
                             <label class="field-label" data-i18n="episode.budget">Budget local estimé</label>
-                            <input type="text" name="budget">
+                            <input type="text" name="budget" data-i18n-placeholder="episode.budget">
                         </div>
                         <div class="field-group">
                             <label class="field-label" data-i18n="episode.notes">Notes production</label>
-                            <textarea name="notes" rows="3"></textarea>
+                            <textarea name="notes" rows="3" data-i18n-placeholder="episode.notes"></textarea></textarea>
                         </div>
                     </div>
                 </div>
@@ -288,31 +293,31 @@
                         <div class="fields-grid">
                             <div class="field-group">
                                 <label class="field-label" data-i18n="gardiens_details.prenom">Prénom</label>
-                                <input type="text" name="gardien1_prenom">
+                                <input type="text" name="gardien1_prenom" data-i18n-placeholder="gardiens_details.prenom">
                             </div>
                             <div class="field-group">
                                 <label class="field-label" data-i18n="gardiens_details.telephone">Téléphone</label>
-                                <input type="tel" name="gardien1_telephone">
+                                <input type="tel" name="gardien1_telephone" data-i18n-placeholder="gardiens_details.telephone">
                             </div>
                             <div class="field-group">
                                 <label class="field-label" data-i18n="gardiens_details.email">Email</label>
-                                <input type="email" name="gardien1_email">
+                                <input type="email" name="gardien1_email" data-i18n-placeholder="gardiens_details.email">
                             </div>
                             <div class="field-group">
                                 <label class="field-label" data-i18n="gardiens_details.langues">Langues parlées</label>
-                                <input type="text" name="gardien1_langues">
+                                <input type="text" name="gardien1_langues" data-i18n-placeholder="gardiens_details.langues">
                             </div>
                             <div class="field-group" style="grid-column: span 2;">
                                 <label class="field-label" data-i18n="gardiens_details.adresse">Adresse complète</label>
-                                <input type="text" name="gardien1_adresse">
+                                <input type="text" name="gardien1_adresse" data-i18n-placeholder="gardiens_details.adresse">
                             </div>
                             <div class="field-group" style="grid-column: span 2;">
                                 <label class="field-label" data-i18n="gardiens_details.histoire">Histoire personnelle / Parcours de transmission</label>
-                                <textarea name="gardien1_histoire" rows="4"></textarea>
+                                <textarea name="gardien1_histoire" rows="4" data-i18n-placeholder="gardiens_details.histoire"></textarea></textarea>
                             </div>
                             <div class="field-group" style="grid-column: span 2;">
                                 <label class="field-label" data-i18n="gardiens_details.evaluation">Évaluation cinégénie / Capacité de transmission</label>
-                                <textarea name="gardien1_evaluation" rows="3"></textarea>
+                                <textarea name="gardien1_evaluation" rows="3" data-i18n-placeholder="gardiens_details.evaluation"></textarea></textarea>
                             </div>
                         </div>
                     </div>
@@ -323,31 +328,31 @@
                         <div class="fields-grid">
                             <div class="field-group">
                                 <label class="field-label" data-i18n="gardiens_details.prenom">Prénom</label>
-                                <input type="text" name="gardien2_prenom">
+                                <input type="text" name="gardien2_prenom" data-i18n-placeholder="gardiens_details.prenom">
                             </div>
                             <div class="field-group">
                                 <label class="field-label" data-i18n="gardiens_details.telephone">Téléphone</label>
-                                <input type="tel" name="gardien2_telephone">
+                                <input type="tel" name="gardien2_telephone" data-i18n-placeholder="gardiens_details.telephone">
                             </div>
                             <div class="field-group">
                                 <label class="field-label" data-i18n="gardiens_details.email">Email</label>
-                                <input type="email" name="gardien2_email">
+                                <input type="email" name="gardien2_email" data-i18n-placeholder="gardiens_details.email">
                             </div>
                             <div class="field-group">
                                 <label class="field-label" data-i18n="gardiens_details.langues">Langues parlées</label>
-                                <input type="text" name="gardien2_langues">
+                                <input type="text" name="gardien2_langues" data-i18n-placeholder="gardiens_details.langues">
                             </div>
                             <div class="field-group" style="grid-column: span 2;">
                                 <label class="field-label" data-i18n="gardiens_details.adresse">Adresse complète</label>
-                                <input type="text" name="gardien2_adresse">
+                                <input type="text" name="gardien2_adresse" data-i18n-placeholder="gardiens_details.adresse">
                             </div>
                             <div class="field-group" style="grid-column: span 2;">
                                 <label class="field-label" data-i18n="gardiens_details.histoire">Histoire personnelle</label>
-                                <textarea name="gardien2_histoire" rows="4"></textarea>
+                                <textarea name="gardien2_histoire" rows="4" data-i18n-placeholder="gardiens_details.histoire"></textarea></textarea>
                             </div>
                             <div class="field-group" style="grid-column: span 2;">
                                 <label class="field-label" data-i18n="gardiens_details.evaluation">Évaluation cinégénie</label>
-                                <textarea name="gardien2_evaluation" rows="3"></textarea>
+                                <textarea name="gardien2_evaluation" rows="3" data-i18n-placeholder="gardiens_details.evaluation"></textarea></textarea>
                             </div>
                         </div>
                     </div>
@@ -358,31 +363,31 @@
                         <div class="fields-grid">
                             <div class="field-group">
                                 <label class="field-label" data-i18n="gardiens_details.prenom">Prénom</label>
-                                <input type="text" name="gardien3_prenom">
+                                <input type="text" name="gardien3_prenom" data-i18n-placeholder="gardiens_details.prenom">
                             </div>
                             <div class="field-group">
                                 <label class="field-label" data-i18n="gardiens_details.telephone">Téléphone</label>
-                                <input type="tel" name="gardien3_telephone">
+                                <input type="tel" name="gardien3_telephone" data-i18n-placeholder="gardiens_details.telephone">
                             </div>
                             <div class="field-group">
                                 <label class="field-label" data-i18n="gardiens_details.email">Email</label>
-                                <input type="email" name="gardien3_email">
+                                <input type="email" name="gardien3_email" data-i18n-placeholder="gardiens_details.email">
                             </div>
                             <div class="field-group">
                                 <label class="field-label" data-i18n="gardiens_details.langues">Langues parlées</label>
-                                <input type="text" name="gardien3_langues">
+                                <input type="text" name="gardien3_langues" data-i18n-placeholder="gardiens_details.langues">
                             </div>
                             <div class="field-group" style="grid-column: span 2;">
                                 <label class="field-label" data-i18n="gardiens_details.adresse">Adresse complète</label>
-                                <input type="text" name="gardien3_adresse">
+                                <input type="text" name="gardien3_adresse" data-i18n-placeholder="gardiens_details.adresse">
                             </div>
                             <div class="field-group" style="grid-column: span 2;">
                                 <label class="field-label" data-i18n="gardiens_details.histoire">Histoire personnelle</label>
-                                <textarea name="gardien3_histoire" rows="4"></textarea>
+                                <textarea name="gardien3_histoire" rows="4" data-i18n-placeholder="gardiens_details.histoire"></textarea></textarea>
                             </div>
                             <div class="field-group" style="grid-column: span 2;">
                                 <label class="field-label" data-i18n="gardiens_details.evaluation">Évaluation cinégénie</label>
-                                <textarea name="gardien3_evaluation" rows="3"></textarea>
+                                <textarea name="gardien3_evaluation" rows="3" data-i18n-placeholder="gardiens_details.evaluation"></textarea></textarea>
                             </div>
                         </div>
                     </div>
@@ -406,24 +411,24 @@
                         <div class="fields-grid">
                             <div class="field-group">
                                 <label class="field-label" data-i18n="lieux.nom">Nom du lieu</label>
-                                <input type="text" name="lieu1_nom">
+                                <input type="text" name="lieu1_nom" data-i18n-placeholder="lieux.nom">
                             </div>
                             <div class="field-group">
                                 <label class="field-label" data-i18n="lieux.type">Type d'environnement</label>
-                                <input type="text" name="lieu1_type">
+                                <input type="text" name="lieu1_type" data-i18n-placeholder="lieux.type">
                                 <div class="field-hint" data-i18n="lieux.type_hint">village, maison, marché, etc.</div>
                             </div>
                             <div class="field-group" style="grid-column: span 2;">
                                 <label class="field-label" data-i18n="lieux.description">Description visuelle générale</label>
-                                <textarea name="lieu1_description" rows="4"></textarea>
+                                <textarea name="lieu1_description" rows="4" data-i18n-placeholder="lieux.description"></textarea></textarea>
                             </div>
                             <div class="field-group" style="grid-column: span 2;">
                                 <label class="field-label" data-i18n="lieux.elements">Éléments symboliques</label>
-                                <textarea name="lieu1_elements" rows="3"></textarea>
+                                <textarea name="lieu1_elements" rows="3" data-i18n-placeholder="lieux.elements"></textarea></textarea>
                             </div>
                             <div class="field-group" style="grid-column: span 2;">
                                 <label class="field-label" data-i18n="lieux.points_vue">Points de vue remarquables</label>
-                                <textarea name="lieu1_points_vue" rows="3"></textarea>
+                                <textarea name="lieu1_points_vue" rows="3" data-i18n-placeholder="lieux.points_vue"></textarea></textarea>
                             </div>
                         </div>
                         
@@ -432,23 +437,23 @@
                             <div class="fields-grid">
                                 <div class="field-group" style="grid-column: span 2;">
                                     <label class="field-label" data-i18n="lieux.cinegenie">Cinégénie du lieu</label>
-                                    <textarea name="lieu1_cinegenie" rows="3"></textarea>
+                                    <textarea name="lieu1_cinegenie" rows="3" data-i18n-placeholder="lieux.cinegenie"></textarea></textarea>
                                 </div>
                                 <div class="field-group" style="grid-column: span 2;">
                                     <label class="field-label" data-i18n="lieux.axes">Axes de caméra possibles</label>
-                                    <textarea name="lieu1_axes" rows="3"></textarea>
+                                    <textarea name="lieu1_axes" rows="3" data-i18n-placeholder="lieux.axes"></textarea></textarea>
                                 </div>
                                 <div class="field-group">
                                     <label class="field-label" data-i18n="lieux.moments">Moments favorables (lumière)</label>
-                                    <input type="text" name="lieu1_moments">
+                                    <input type="text" name="lieu1_moments" data-i18n-placeholder="lieux.moments">
                                 </div>
                                 <div class="field-group">
                                     <label class="field-label" data-i18n="lieux.ambiance">Ambiance sonore</label>
-                                    <input type="text" name="lieu1_ambiance">
+                                    <input type="text" name="lieu1_ambiance" data-i18n-placeholder="lieux.ambiance">
                                 </div>
                                 <div class="field-group" style="grid-column: span 2;">
                                     <label class="field-label" data-i18n="lieux.adequation">Adéquation avec la narration</label>
-                                    <textarea name="lieu1_adequation" rows="3"></textarea>
+                                    <textarea name="lieu1_adequation" rows="3" data-i18n-placeholder="lieux.adequation"></textarea></textarea>
                                 </div>
                             </div>
                         </div>
@@ -458,31 +463,31 @@
                             <div class="fields-grid">
                                 <div class="field-group">
                                     <label class="field-label" data-i18n="lieux.accessibilite">Accessibilité</label>
-                                    <textarea name="lieu1_accessibilite" rows="2"></textarea>
+                                    <textarea name="lieu1_accessibilite" rows="2" data-i18n-placeholder="lieux.accessibilite"></textarea></textarea>
                                 </div>
                                 <div class="field-group">
                                     <label class="field-label" data-i18n="lieux.securite">Sécurité</label>
-                                    <textarea name="lieu1_securite" rows="2"></textarea>
+                                    <textarea name="lieu1_securite" rows="2" data-i18n-placeholder="lieux.securite"></textarea></textarea>
                                 </div>
                                 <div class="field-group">
                                     <label class="field-label" data-i18n="lieux.electricite">Électricité</label>
-                                    <input type="text" name="lieu1_electricite">
+                                    <input type="text" name="lieu1_electricite" data-i18n-placeholder="lieux.electricite">
                                 </div>
                                 <div class="field-group">
                                     <label class="field-label" data-i18n="lieux.espace">Espace équipe/matériel</label>
-                                    <input type="text" name="lieu1_espace">
+                                    <input type="text" name="lieu1_espace" data-i18n-placeholder="lieux.espace">
                                 </div>
                                 <div class="field-group" style="grid-column: span 2;">
                                     <label class="field-label" data-i18n="lieux.protection">Protection météo disponible</label>
-                                    <textarea name="lieu1_protection" rows="2"></textarea>
+                                    <textarea name="lieu1_protection" rows="2" data-i18n-placeholder="lieux.protection"></textarea></textarea>
                                 </div>
                                 <div class="field-group" style="grid-column: span 2;">
                                     <label class="field-label" data-i18n="lieux.contraintes_meteo">Contraintes météorologiques</label>
-                                    <textarea name="lieu1_contraintes_meteo" rows="2"></textarea>
+                                    <textarea name="lieu1_contraintes_meteo" rows="2" data-i18n-placeholder="lieux.contraintes_meteo"></textarea></textarea>
                                 </div>
                                 <div class="field-group" style="grid-column: span 2;">
                                     <label class="field-label" data-i18n="lieux.autorisations">Autorisations nécessaires</label>
-                                    <textarea name="lieu1_autorisations" rows="2"></textarea>
+                                    <textarea name="lieu1_autorisations" rows="2" data-i18n-placeholder="lieux.autorisations"></textarea></textarea>
                                 </div>
                             </div>
                         </div>
@@ -493,23 +498,23 @@
                         <div class="fields-grid">
                             <div class="field-group">
                                 <label class="field-label" data-i18n="lieux.nom">Nom du lieu</label>
-                                <input type="text" name="lieu2_nom">
+                                <input type="text" name="lieu2_nom" data-i18n-placeholder="lieux.nom">
                             </div>
                             <div class="field-group">
                                 <label class="field-label" data-i18n="lieux.type">Type d'environnement</label>
-                                <input type="text" name="lieu2_type">
+                                <input type="text" name="lieu2_type" data-i18n-placeholder="lieux.type">
                             </div>
                             <div class="field-group" style="grid-column: span 2;">
                                 <label class="field-label" data-i18n="lieux.description">Description visuelle générale</label>
-                                <textarea name="lieu2_description" rows="4"></textarea>
+                                <textarea name="lieu2_description" rows="4" data-i18n-placeholder="lieux.description"></textarea></textarea>
                             </div>
                             <div class="field-group" style="grid-column: span 2;">
                                 <label class="field-label" data-i18n="lieux.elements">Éléments symboliques</label>
-                                <textarea name="lieu2_elements" rows="3"></textarea>
+                                <textarea name="lieu2_elements" rows="3" data-i18n-placeholder="lieux.elements"></textarea></textarea>
                             </div>
                             <div class="field-group" style="grid-column: span 2;">
                                 <label class="field-label" data-i18n="lieux.points_vue">Points de vue remarquables</label>
-                                <textarea name="lieu2_points_vue" rows="3"></textarea>
+                                <textarea name="lieu2_points_vue" rows="3" data-i18n-placeholder="lieux.points_vue"></textarea></textarea>
                             </div>
                         </div>
                         
@@ -518,23 +523,23 @@
                             <div class="fields-grid">
                                 <div class="field-group" style="grid-column: span 2;">
                                     <label class="field-label" data-i18n="lieux.cinegenie">Cinégénie du lieu</label>
-                                    <textarea name="lieu2_cinegenie" rows="3"></textarea>
+                                    <textarea name="lieu2_cinegenie" rows="3" data-i18n-placeholder="lieux.cinegenie"></textarea></textarea>
                                 </div>
                                 <div class="field-group" style="grid-column: span 2;">
                                     <label class="field-label" data-i18n="lieux.axes">Axes de caméra possibles</label>
-                                    <textarea name="lieu2_axes" rows="3"></textarea>
+                                    <textarea name="lieu2_axes" rows="3" data-i18n-placeholder="lieux.axes"></textarea></textarea>
                                 </div>
                                 <div class="field-group">
                                     <label class="field-label" data-i18n="lieux.moments">Moments favorables (lumière)</label>
-                                    <input type="text" name="lieu2_moments">
+                                    <input type="text" name="lieu2_moments" data-i18n-placeholder="lieux.moments">
                                 </div>
                                 <div class="field-group">
                                     <label class="field-label" data-i18n="lieux.ambiance">Ambiance sonore</label>
-                                    <input type="text" name="lieu2_ambiance">
+                                    <input type="text" name="lieu2_ambiance" data-i18n-placeholder="lieux.ambiance">
                                 </div>
                                 <div class="field-group" style="grid-column: span 2;">
                                     <label class="field-label" data-i18n="lieux.adequation">Adéquation avec la narration</label>
-                                    <textarea name="lieu2_adequation" rows="3"></textarea>
+                                    <textarea name="lieu2_adequation" rows="3" data-i18n-placeholder="lieux.adequation"></textarea></textarea>
                                 </div>
                             </div>
                         </div>
@@ -544,31 +549,31 @@
                             <div class="fields-grid">
                                 <div class="field-group">
                                     <label class="field-label" data-i18n="lieux.accessibilite">Accessibilité</label>
-                                    <textarea name="lieu2_accessibilite" rows="2"></textarea>
+                                    <textarea name="lieu2_accessibilite" rows="2" data-i18n-placeholder="lieux.accessibilite"></textarea></textarea>
                                 </div>
                                 <div class="field-group">
                                     <label class="field-label" data-i18n="lieux.securite">Sécurité</label>
-                                    <textarea name="lieu2_securite" rows="2"></textarea>
+                                    <textarea name="lieu2_securite" rows="2" data-i18n-placeholder="lieux.securite"></textarea></textarea>
                                 </div>
                                 <div class="field-group">
                                     <label class="field-label" data-i18n="lieux.electricite">Électricité</label>
-                                    <input type="text" name="lieu2_electricite">
+                                    <input type="text" name="lieu2_electricite" data-i18n-placeholder="lieux.electricite">
                                 </div>
                                 <div class="field-group">
                                     <label class="field-label" data-i18n="lieux.espace">Espace équipe/matériel</label>
-                                    <input type="text" name="lieu2_espace">
+                                    <input type="text" name="lieu2_espace" data-i18n-placeholder="lieux.espace">
                                 </div>
                                 <div class="field-group" style="grid-column: span 2;">
                                     <label class="field-label" data-i18n="lieux.protection">Protection météo disponible</label>
-                                    <textarea name="lieu2_protection" rows="2"></textarea>
+                                    <textarea name="lieu2_protection" rows="2" data-i18n-placeholder="lieux.protection"></textarea></textarea>
                                 </div>
                                 <div class="field-group" style="grid-column: span 2;">
                                     <label class="field-label" data-i18n="lieux.contraintes_meteo">Contraintes météorologiques</label>
-                                    <textarea name="lieu2_contraintes_meteo" rows="2"></textarea>
+                                    <textarea name="lieu2_contraintes_meteo" rows="2" data-i18n-placeholder="lieux.contraintes_meteo"></textarea></textarea>
                                 </div>
                                 <div class="field-group" style="grid-column: span 2;">
                                     <label class="field-label" data-i18n="lieux.autorisations">Autorisations nécessaires</label>
-                                    <textarea name="lieu2_autorisations" rows="2"></textarea>
+                                    <textarea name="lieu2_autorisations" rows="2" data-i18n-placeholder="lieux.autorisations"></textarea></textarea>
                                 </div>
                             </div>
                         </div>
@@ -579,23 +584,23 @@
                         <div class="fields-grid">
                             <div class="field-group">
                                 <label class="field-label" data-i18n="lieux.nom">Nom du lieu</label>
-                                <input type="text" name="lieu3_nom">
+                                <input type="text" name="lieu3_nom" data-i18n-placeholder="lieux.nom">
                             </div>
                             <div class="field-group">
                                 <label class="field-label" data-i18n="lieux.type">Type d'environnement</label>
-                                <input type="text" name="lieu3_type">
+                                <input type="text" name="lieu3_type" data-i18n-placeholder="lieux.type">
                             </div>
                             <div class="field-group" style="grid-column: span 2;">
                                 <label class="field-label" data-i18n="lieux.description">Description visuelle générale</label>
-                                <textarea name="lieu3_description" rows="4"></textarea>
+                                <textarea name="lieu3_description" rows="4" data-i18n-placeholder="lieux.description"></textarea></textarea>
                             </div>
                             <div class="field-group" style="grid-column: span 2;">
                                 <label class="field-label" data-i18n="lieux.elements">Éléments symboliques</label>
-                                <textarea name="lieu3_elements" rows="3"></textarea>
+                                <textarea name="lieu3_elements" rows="3" data-i18n-placeholder="lieux.elements"></textarea></textarea>
                             </div>
                             <div class="field-group" style="grid-column: span 2;">
                                 <label class="field-label" data-i18n="lieux.points_vue">Points de vue remarquables</label>
-                                <textarea name="lieu3_points_vue" rows="3"></textarea>
+                                <textarea name="lieu3_points_vue" rows="3" data-i18n-placeholder="lieux.points_vue"></textarea></textarea>
                             </div>
                         </div>
                         
@@ -604,23 +609,23 @@
                             <div class="fields-grid">
                                 <div class="field-group" style="grid-column: span 2;">
                                     <label class="field-label" data-i18n="lieux.cinegenie">Cinégénie du lieu</label>
-                                    <textarea name="lieu3_cinegenie" rows="3"></textarea>
+                                    <textarea name="lieu3_cinegenie" rows="3" data-i18n-placeholder="lieux.cinegenie"></textarea></textarea>
                                 </div>
                                 <div class="field-group" style="grid-column: span 2;">
                                     <label class="field-label" data-i18n="lieux.axes">Axes de caméra possibles</label>
-                                    <textarea name="lieu3_axes" rows="3"></textarea>
+                                    <textarea name="lieu3_axes" rows="3" data-i18n-placeholder="lieux.axes"></textarea></textarea>
                                 </div>
                                 <div class="field-group">
                                     <label class="field-label" data-i18n="lieux.moments">Moments favorables (lumière)</label>
-                                    <input type="text" name="lieu3_moments">
+                                    <input type="text" name="lieu3_moments" data-i18n-placeholder="lieux.moments">
                                 </div>
                                 <div class="field-group">
                                     <label class="field-label" data-i18n="lieux.ambiance">Ambiance sonore</label>
-                                    <input type="text" name="lieu3_ambiance">
+                                    <input type="text" name="lieu3_ambiance" data-i18n-placeholder="lieux.ambiance">
                                 </div>
                                 <div class="field-group" style="grid-column: span 2;">
                                     <label class="field-label" data-i18n="lieux.adequation">Adéquation avec la narration</label>
-                                    <textarea name="lieu3_adequation" rows="3"></textarea>
+                                    <textarea name="lieu3_adequation" rows="3" data-i18n-placeholder="lieux.adequation"></textarea></textarea>
                                 </div>
                             </div>
                         </div>
@@ -630,31 +635,31 @@
                             <div class="fields-grid">
                                 <div class="field-group">
                                     <label class="field-label" data-i18n="lieux.accessibilite">Accessibilité</label>
-                                    <textarea name="lieu3_accessibilite" rows="2"></textarea>
+                                    <textarea name="lieu3_accessibilite" rows="2" data-i18n-placeholder="lieux.accessibilite"></textarea></textarea>
                                 </div>
                                 <div class="field-group">
                                     <label class="field-label" data-i18n="lieux.securite">Sécurité</label>
-                                    <textarea name="lieu3_securite" rows="2"></textarea>
+                                    <textarea name="lieu3_securite" rows="2" data-i18n-placeholder="lieux.securite"></textarea></textarea>
                                 </div>
                                 <div class="field-group">
                                     <label class="field-label" data-i18n="lieux.electricite">Électricité</label>
-                                    <input type="text" name="lieu3_electricite">
+                                    <input type="text" name="lieu3_electricite" data-i18n-placeholder="lieux.electricite">
                                 </div>
                                 <div class="field-group">
                                     <label class="field-label" data-i18n="lieux.espace">Espace équipe/matériel</label>
-                                    <input type="text" name="lieu3_espace">
+                                    <input type="text" name="lieu3_espace" data-i18n-placeholder="lieux.espace">
                                 </div>
                                 <div class="field-group" style="grid-column: span 2;">
                                     <label class="field-label" data-i18n="lieux.protection">Protection météo disponible</label>
-                                    <textarea name="lieu3_protection" rows="2"></textarea>
+                                    <textarea name="lieu3_protection" rows="2" data-i18n-placeholder="lieux.protection"></textarea></textarea>
                                 </div>
                                 <div class="field-group" style="grid-column: span 2;">
                                     <label class="field-label" data-i18n="lieux.contraintes_meteo">Contraintes météorologiques</label>
-                                    <textarea name="lieu3_contraintes_meteo" rows="2"></textarea>
+                                    <textarea name="lieu3_contraintes_meteo" rows="2" data-i18n-placeholder="lieux.contraintes_meteo"></textarea></textarea>
                                 </div>
                                 <div class="field-group" style="grid-column: span 2;">
                                     <label class="field-label" data-i18n="lieux.autorisations">Autorisations nécessaires</label>
-                                    <textarea name="lieu3_autorisations" rows="2"></textarea>
+                                    <textarea name="lieu3_autorisations" rows="2" data-i18n-placeholder="lieux.autorisations"></textarea></textarea>
                                 </div>
                             </div>
                         </div>
@@ -761,9 +766,8 @@
     <!-- FOOTER -->
     <footer>
         <div class="footer-content">
-            <div class="footer-title">Les Gardiens de la Tradition</div>
-            <p>Un projet documentaire sur la transmission des savoirs ancestraux</p>
-            <p>© 2025 - Tous droits réservés</p>
+            <p>© 2025 — Durand & Pierson Associates</p>
+            <p>Dépôt e-dpo SACD</p>
         </div>
     </footer>
     
@@ -776,13 +780,290 @@
             fixer_email: {{ fixer_email|default('')|tojson }},
             fixer_telephone: {{ fixer_telephone|default('')|tojson }},
             langue_default: {{ langue_default|default('FR')|tojson }},
-            reperage_id: {{ reperage_id|default('null')|tojson }},
+            reperage_id: {{ REPERAGE_ID|default('null')|tojson }},
             region: {{ FIXER_DATA.region|default('')|tojson if FIXER_DATA else '""' }},
             pays: {{ FIXER_DATA.pays|default('')|tojson if FIXER_DATA else '""' }}
         };
         console.log('🔍 FIXER_DATA injecté:', window.FIXER_DATA);
     </script>
     
+    <!-- Quill.js -->
+    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+    
     <script src="/static/js/app.js"></script>
+    
+    <!-- Initialiser Lucide Icons -->
+    <script>
+        lucide.createIcons();
+    </script>
+    
+    <!-- Initialiser WYSIWYG Quill pour textareas -->
+    <script>
+        function initQuillEditors() {
+            if (typeof Quill === 'undefined') {
+                console.log('⏳ Quill pas encore chargé, on réessaie...');
+                setTimeout(initQuillEditors, 100);
+                return;
+            }
+            
+            const textareas = document.querySelectorAll('textarea:not(#chat-input):not([data-quill-initialized])');
+            
+            if (textareas.length === 0) {
+                console.log('✅ Aucun textarea à initialiser');
+                return;
+            }
+            
+            textareas.forEach(function(textarea) {
+                // Marquer comme initialisé
+                textarea.setAttribute('data-quill-initialized', 'true');
+                
+                // Créer conteneur Quill
+                const wrapper = document.createElement('div');
+                wrapper.className = 'wysiwyg-wrapper';
+                textarea.parentNode.insertBefore(wrapper, textarea);
+                
+                // Créer éditeur Quill
+                const editorDiv = document.createElement('div');
+                editorDiv.className = 'wysiwyg-editor';
+                wrapper.appendChild(editorDiv);
+                
+                // Cacher textarea original
+                textarea.style.display = 'none';
+                wrapper.appendChild(textarea);
+                
+                // Initialiser Quill avec configuration complète
+                const quill = new Quill(editorDiv, {
+                    theme: 'snow',
+                    placeholder: textarea.placeholder || 'Écrivez ici...',
+                    modules: {
+                        toolbar: {
+                            container: [
+                                ['bold', 'italic', 'underline'],
+                                ['link'],
+                                [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                                ['clean']
+                            ],
+                            handlers: {
+                                'link': function(value) {
+                                    if (value) {
+                                        const href = prompt('Entrez l\'URL du lien:', 'https://');
+                                        if (href) {
+                                            this.quill.format('link', href);
+                                        }
+                                    } else {
+                                        this.quill.format('link', false);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+                
+                // Charger contenu initial
+                if (textarea.value) {
+                    quill.root.innerHTML = textarea.value;
+                }
+                
+                // Synchroniser avec textarea
+                quill.on('text-change', function() {
+                    textarea.value = quill.root.innerHTML;
+                    // Déclencher événement change pour sauvegarde auto
+                    textarea.dispatchEvent(new Event('change', { bubbles: true }));
+                });
+                
+                // Stocker référence Quill sur textarea
+                textarea.quillEditor = quill;
+            });
+            
+            console.log('✅ WYSIWYG Quill initialisé pour', textareas.length, 'textareas');
+        }
+        
+        // Lancer après chargement du DOM
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initQuillEditors);
+        } else {
+            initQuillEditors();
+        }
+    </script>
+
+    <!-- SYSTÈME DE TRADUCTION MULTILINGUE -->
+    <script>
+        let currentLang = 'FR';
+        let translations = {};
+
+        // Charger les traductions
+        async function loadTranslations() {
+            try {
+                const response = await fetch('/translations/i18n.json');
+                translations = await response.json();
+                console.log('✅ Traductions chargées:', Object.keys(translations));
+            } catch (error) {
+                console.error('❌ Erreur chargement traductions:', error);
+            }
+        }
+
+        // Appliquer les traductions
+        function applyTranslations(lang) {
+            currentLang = lang;
+            const langData = translations[lang];
+            
+            if (!langData) {
+                console.error('❌ Langue non trouvée:', lang);
+                return;
+            }
+
+            console.log(`🌍 Application traductions ${lang}...`);
+
+            // 1. Traduire tous les éléments avec data-i18n
+            document.querySelectorAll('[data-i18n]').forEach(element => {
+                const key = element.getAttribute('data-i18n');
+                const translation = getNestedTranslation(langData, key);
+                
+                if (translation) {
+                    element.textContent = translation;
+                }
+            });
+
+            // 2. Traduire tous les placeholders avec data-i18n-placeholder
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(element => {
+                const key = element.getAttribute('data-i18n-placeholder');
+                const translation = getNestedTranslation(langData, key);
+                
+                if (translation) {
+                    element.placeholder = translation;
+                }
+            });
+
+            // 3. Mettre à jour les boutons de langue
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                if (btn.getAttribute('data-lang') === lang) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+
+            console.log(`✅ Traduction ${lang} appliquée`);
+        }
+
+        // Récupérer traduction imbriquée (ex: "territoire.nom" → translations.FR.territoire.nom)
+        function getNestedTranslation(obj, path) {
+            const keys = path.split('.');
+            let result = obj;
+            
+            for (const key of keys) {
+                if (result && result[key] !== undefined) {
+                    result = result[key];
+                } else {
+                    return null;
+                }
+            }
+            
+            return result;
+        }
+
+        // Initialiser le système de traduction
+        async function initTranslationSystem() {
+            await loadTranslations();
+            
+            // Langue par défaut (priorité : FIXER_DATA > localStorage > FR)
+            let defaultLang = 'FR';
+            if (window.FIXER_DATA && window.FIXER_DATA.langue_default) {
+                defaultLang = window.FIXER_DATA.langue_default;
+            } else if (localStorage.getItem('selectedLanguage')) {
+                defaultLang = localStorage.getItem('selectedLanguage');
+            }
+            
+            // Appliquer langue par défaut
+            applyTranslations(defaultLang);
+            
+            // Ajouter événements sur boutons langue
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const lang = btn.getAttribute('data-lang');
+                    applyTranslations(lang);
+                    localStorage.setItem('selectedLanguage', lang);
+                });
+            });
+        }
+
+        // Lancer au chargement
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initTranslationSystem);
+        } else {
+            initTranslationSystem();
+        }
+    </script>
+
+<!-- PANNEAU IA LATÉRAL GAUCHE -->
+<button class="ai-floating-btn" onclick="toggleAIPanel()" title="Assistant IA RootsKeepers">
+    <i data-lucide="brain-circuit" style="width: 28px; height: 28px;"></i>
+</button>
+
+<div class="ai-panel-overlay" id="aiPanelOverlay" onclick="closeAIPanel()"></div>
+
+<div class="ai-panel" id="aiPanel">
+    <div class="ai-panel-header">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <i data-lucide="brain-circuit" style="width: 24px; height: 24px; color: white;"></i>
+            <h3 style="margin: 0; color: white; font-size: 1.1rem;">Assistant IA RootsKeepers</h3>
+        </div>
+        <button class="ai-panel-close" onclick="closeAIPanel()">
+            <i data-lucide="x" style="width: 20px; height: 20px;"></i>
+        </button>
+    </div>
+    
+    <div class="ai-panel-body">
+        <iframe 
+            src="https://destinationsetcuisines.com/site" 
+            frameborder="0"
+            style="width: 100%; height: 100%; border: none;"
+            title="Assistant IA RootsKeepers"
+        ></iframe>
+    </div>
+</div>
+
+<script>
+// PANNEAU IA - JAVASCRIPT
+function toggleAIPanel() {
+    const panel = document.getElementById('aiPanel');
+    const overlay = document.getElementById('aiPanelOverlay');
+    
+    if (panel.classList.contains('active')) {
+        closeAIPanel();
+    } else {
+        openAIPanel();
+    }
+}
+
+function openAIPanel() {
+    const panel = document.getElementById('aiPanel');
+    const overlay = document.getElementById('aiPanelOverlay');
+    
+    panel.classList.add('active');
+    overlay.classList.add('active');
+    document.body.style.overflow = 'hidden';
+    
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+}
+
+function closeAIPanel() {
+    const panel = document.getElementById('aiPanel');
+    const overlay = document.getElementById('aiPanelOverlay');
+    
+    panel.classList.remove('active');
+    overlay.classList.remove('active');
+    document.body.style.overflow = '';
+}
+
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeAIPanel();
+    }
+});
+</script>
+
 </body>
 </html>

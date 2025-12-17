@@ -11,6 +11,7 @@ class Reperage(Base):
     __tablename__ = 'reperages'
     
     id = Column(Integer, primary_key=True)
+    token = Column(String(32), unique=True, nullable=True)  # Token sécurisé pour URLs
     created_at = Column(DateTime, default=datetime.now)
     updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
     langue_interface = Column(String(4), default='FR')  # FR, GB, ITAL, ESP
@@ -19,6 +20,7 @@ class Reperage(Base):
     # Informations fixer
     fixer_id = Column(Integer, ForeignKey('fixers.id'), nullable=True)
     fixer_nom = Column(String(255))
+    fixer_prenom = Column(String(255))
     fixer_email = Column(String(255))
     fixer_telephone = Column(String(50))
     
@@ -30,6 +32,10 @@ class Reperage(Base):
     # Épisode (stocké en JSON)
     episode_data = Column(Text)  # JSON
     
+    # Nouveaux champs pour gestion admin
+    notes_admin = Column(Text)  # Notes administratives internes
+    image_region = Column(String(500))  # URL de l'image emblématique de la région
+    
     # Relations
     gardiens = relationship("Gardien", back_populates="reperage", cascade="all, delete-orphan")
     lieux = relationship("Lieu", back_populates="reperage", cascade="all, delete-orphan")
@@ -38,6 +44,7 @@ class Reperage(Base):
     def to_dict(self):
         return {
             'id': self.id,
+            'token': self.token,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'updated_at': self.updated_at.isoformat() if self.updated_at else None,
             'langue_interface': self.langue_interface,
@@ -209,20 +216,42 @@ class Media(Base):
 class Fixer(Base):
     __tablename__ = 'fixers'
     
+    # Identité
     id = Column(Integer, primary_key=True)
     nom = Column(String(100))
     prenom = Column(String(100))
     email = Column(String(200), unique=True)
     telephone = Column(String(50))
+    telephone_2 = Column(String(50))
     
+    # Professionnel
+    societe = Column(String(200))
+    fonction = Column(String(100))
+    site_web = Column(String(255))
+    numero_siret = Column(String(50))
+    
+    # Adresse
+    adresse_1 = Column(String(255))
+    adresse_2 = Column(String(255))
+    code_postal = Column(String(20))
+    ville = Column(String(100))
     pays = Column(String(100))
     region = Column(String(200))
+    
+    # Profil
+    photo_profil_url = Column(String(500))
+    bio = Column(Text)
+    specialites = Column(Text)
+    
+    # Langues
+    langues_parlees = Column(String(255))
     langue_preferee = Column(String(10), default='FR')  # FR, GB, ITAL, ESP
     
+    # Système
     token_unique = Column(String(8), unique=True)
     lien_personnel = Column(String(500))
-    
     actif = Column(Boolean, default=True)
+    notes_internes = Column(Text)
     created_at = Column(DateTime, default=datetime.now)
     updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
     
@@ -233,12 +262,26 @@ class Fixer(Base):
             'prenom': self.prenom,
             'email': self.email,
             'telephone': self.telephone,
+            'telephone_2': self.telephone_2,
+            'societe': self.societe,
+            'fonction': self.fonction,
+            'site_web': self.site_web,
+            'numero_siret': self.numero_siret,
+            'adresse_1': self.adresse_1,
+            'adresse_2': self.adresse_2,
+            'code_postal': self.code_postal,
+            'ville': self.ville,
             'pays': self.pays,
             'region': self.region,
+            'photo_profil_url': self.photo_profil_url,
+            'bio': self.bio,
+            'specialites': self.specialites,
+            'langues_parlees': self.langues_parlees,
             'langue_preferee': self.langue_preferee,
             'token_unique': self.token_unique,
             'lien_personnel': self.lien_personnel,
             'actif': self.actif,
+            'notes_internes': self.notes_internes,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'updated_at': self.updated_at.isoformat() if self.updated_at else None
         }

@@ -2101,7 +2101,7 @@
                 {% endif %}
                 <div class="modal-info-row">
                     <div class="modal-label">Email</div>
-                    <div class="modal-value"><a href="mailto:{{ fixer.email }}" style="color: #3b82f6;">{{ fixer.email }}</a></div>
+                    <div class="modal-value"><a href="/cdn-cgi/l/email-protection#cbb0b0ebada2b3aeb9e5aea6aaa2a7ebb6b6" style="color: #3b82f6;">{{ fixer.email }}</a></div>
                 </div>
                 <div class="modal-info-row">
                     <div class="modal-label">Téléphone</div>
@@ -2143,8 +2143,224 @@
                 </a>
                 {% endif %}
             </div>
-        </div>
+           </div>
     </div>
+</div>
 
-</body>
-</html>
+<!-- ========================================
+     PANNEAU IA - STYLES
+     ======================================== -->
+<style>
+/* Bouton flottant gauche */
+.ai-floating-btn {
+    position: fixed !important;
+    left: 20px !important;
+    bottom: 20px !important;
+    width: 60px !important;
+    height: 60px !important;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 50% !important;
+    cursor: pointer !important;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    z-index: 9999 !important;
+    transition: all 0.3s ease !important;
+}
+
+.ai-floating-btn:hover {
+    transform: scale(1.1) !important;
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6) !important;
+}
+
+/* Overlay sombre */
+.ai-panel-overlay {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    background: rgba(0, 0, 0, 0.5) !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    transition: all 0.3s ease !important;
+    z-index: 9998 !important;
+}
+
+.ai-panel-overlay.active {
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* Panneau latéral */
+.ai-panel {
+    position: fixed !important;
+    left: -75% !important;
+    top: 0 !important;
+    width: 75% !important;
+    height: 100vh !important;
+    background: white !important;
+    box-shadow: 4px 0 20px rgba(0, 0, 0, 0.2) !important;
+    z-index: 9999 !important;
+    transition: left 0.3s ease !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+.ai-panel.active {
+    left: 0 !important;
+}
+
+/* Header du panneau */
+.ai-panel-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    padding: 20px !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+    flex-shrink: 0 !important;
+}
+
+.ai-panel-close {
+    background: rgba(255, 255, 255, 0.2) !important;
+    color: white !important;
+    border: none !important;
+    width: 36px !important;
+    height: 36px !important;
+    border-radius: 50% !important;
+    cursor: pointer !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: all 0.2s ease !important;
+}
+
+.ai-panel-close:hover {
+    background: rgba(255, 255, 255, 0.3) !important;
+    transform: rotate(90deg) !important;
+}
+
+/* Corps du panneau */
+.ai-panel-body {
+    flex: 1 !important;
+    overflow: hidden !important;
+    background: #f5f5f5 !important;
+}
+
+/* Responsive mobile */
+@media (max-width: 768px) {
+    .ai-panel {
+        width: 90% !important;
+        left: -90% !important;
+    }
+    
+    .ai-floating-btn {
+        width: 50px !important;
+        height: 50px !important;
+        left: 15px !important;
+        bottom: 15px !important;
+    }
+}
+</style>
+
+<!-- ========================================
+     PANNEAU IA - HTML
+     ======================================== -->
+<!-- Bouton flottant -->
+<button class="ai-floating-btn" onclick="toggleAIPanel()" title="Assistant IA RootsKeepers">
+    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"></path>
+        <path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z"></path>
+        <path d="M15 13a4.5 4.5 0 0 1-3-4 4.5 4.5 0 0 1-3 4"></path>
+        <path d="M17.599 6.5a3 3 0 0 0 .399-1.375"></path>
+        <path d="M6.003 5.125A3 3 0 0 0 6.401 6.5"></path>
+        <path d="M3.477 10.896a4 4 0 0 1 .585-.396"></path>
+        <path d="M19.938 10.5a4 4 0 0 1 .585.396"></path>
+        <path d="M6 18a4 4 0 0 1-1.967-.516"></path>
+        <path d="M19.967 17.484A4 4 0 0 1 18 18"></path>
+    </svg>
+</button>
+
+<!-- Overlay -->
+<div class="ai-panel-overlay" id="aiPanelOverlay" onclick="closeAIPanel()"></div>
+
+<!-- Panneau latéral -->
+<div class="ai-panel" id="aiPanel">
+    <div class="ai-panel-header">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"></path>
+                <path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z"></path>
+                <path d="M15 13a4.5 4.5 0 0 1-3-4 4.5 4.5 0 0 1-3 4"></path>
+                <path d="M17.599 6.5a3 3 0 0 0 .399-1.375"></path>
+                <path d="M6.003 5.125A3 3 0 0 0 6.401 6.5"></path>
+                <path d="M3.477 10.896a4 4 0 0 1 .585-.396"></path>
+                <path d="M19.938 10.5a4 4 0 0 1 .585.396"></path>
+                <path d="M6 18a4 4 0 0 1-1.967-.516"></path>
+                <path d="M19.967 17.484A4 4 0 0 1 18 18"></path>
+            </svg>
+            <h3 style="margin: 0; color: white; font-size: 1.1rem;">Assistant IA RootsKeepers</h3>
+        </div>
+        <button class="ai-panel-close" onclick="closeAIPanel()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18 6 6 18"></path>
+                <path d="m6 6 12 12"></path>
+            </svg>
+        </button>
+    </div>
+    
+    <div class="ai-panel-body">
+        <iframe 
+            src="https://destinationsetcuisines.com/site" 
+            frameborder="0"
+            style="width: 100%; height: 100%; border: none;"
+            title="Assistant IA RootsKeepers"
+        ></iframe>
+    </div>
+</div>
+
+<!-- ========================================
+     PANNEAU IA - JAVASCRIPT
+     ======================================== -->
+<script>
+function toggleAIPanel() {
+    const panel = document.getElementById('aiPanel');
+    const overlay = document.getElementById('aiPanelOverlay');
+    
+    if (panel.classList.contains('active')) {
+        closeAIPanel();
+    } else {
+        openAIPanel();
+    }
+}
+
+function openAIPanel() {
+    const panel = document.getElementById('aiPanel');
+    const overlay = document.getElementById('aiPanelOverlay');
+    
+    panel.classList.add('active');
+    overlay.classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeAIPanel() {
+    const panel = document.getElementById('aiPanel');
+    const overlay = document.getElementById('aiPanelOverlay');
+    
+    panel.classList.remove('active');
+    overlay.classList.remove('active');
+    document.body.style.overflow = '';
+}
+
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeAIPanel();
+    }
+});
+</script>
+
+{% endblock %}
