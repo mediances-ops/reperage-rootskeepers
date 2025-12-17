@@ -82,7 +82,7 @@ app.jinja_env.filters['linkify'] = linkify_text
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return redirect('/admin')
 
 # ============= API TRADUCTIONS =============
 
@@ -1491,3 +1491,4 @@ if __name__ == '__main__':
     print("📊 Base de données: SQLite (reperage.db)")
     print("\n✅ Serveur démarré avec succès!\n")
     app.run(debug=True, host='0.0.0.0', port=5000)
+
