@@ -1482,7 +1482,7 @@ def admin_logout():
     """Déconnexion admin (placeholder)"""
     return redirect('/admin')
 
-```python
+
 # ============= ROUTE TEMPORAIRE TÉLÉCHARGEMENT DB =============
 @app.route('/download-db-secret-xyz123', methods=['GET'])
 def download_database_temp():
@@ -1500,17 +1500,6 @@ def download_database_temp():
         download_name='reperage.db'
     )
 # ============= FIN ROUTE TEMPORAIRE =============
-```
-
-
-
-
-
-
-
-
-
-
 
 
 if __name__ == '__main__':
@@ -1521,6 +1510,7 @@ if __name__ == '__main__':
     print("📊 Base de données: SQLite (reperage.db)")
     print("\n✅ Serveur démarré avec succès!\n")
     app.run(debug=True, host='0.0.0.0', port=5000)
+
 
 
 
