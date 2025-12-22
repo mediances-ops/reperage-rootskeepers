@@ -1483,6 +1483,36 @@ def admin_logout():
     return redirect('/admin')
 
 
+# ============= ROUTE TEMPORAIRE TÉLÉCHARGEMENT DB =============
+@app.route('/download-db-secret-xyz123', methods=['GET'])
+def download_database_temp():
+    """Route temporaire pour télécharger reperage.db"""
+    import os
+    db_path = 'reperage.db'
+    
+    if not os.path.exists(db_path):
+        return "Base de données introuvable", 404
+    
+    return send_file(
+        db_path,
+        mimetype='application/octet-stream',
+        as_attachment=True,
+        download_name='reperage.db'
+    )
+# ============= FIN ROUTE TEMPORAIRE =============
+
+
+
+
+
+
+
+
+
+
+
+
+
 if __name__ == '__main__':
     print("\n" + "="*60)
     print("🎬 SERVEUR DE REPÉRAGE - LES GARDIENS DE LA TRADITION")
@@ -1491,4 +1521,5 @@ if __name__ == '__main__':
     print("📊 Base de données: SQLite (reperage.db)")
     print("\n✅ Serveur démarré avec succès!\n")
     app.run(debug=True, host='0.0.0.0', port=5000)
+
 
